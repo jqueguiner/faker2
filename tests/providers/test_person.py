@@ -11,6 +11,7 @@ from faker2.providers.person.az_AZ import Provider as AzAzProvider
 from faker2.providers.person.cs_CZ import Provider as CsCZProvider
 from faker2.providers.person.de_AT import Provider as DeAtProvider
 from faker2.providers.person.de_LI import Provider as DeLiProvider
+from faker2.providers.person.efik_NG import Provider as EfikNgProvider
 from faker2.providers.person.en import Provider as EnProvider
 from faker2.providers.person.en_GB import Provider as EnGBProvider
 from faker2.providers.person.en_IE import Provider as EnIEProvider
@@ -352,6 +353,69 @@ class TestDeLi(unittest.TestCase):
         name_male = self.fake.first_name_male()
         assert isinstance(name_male, str)
         assert name_male in DeLiProvider.first_names_male
+
+
+class TestEfikNg(unittest.TestCase):
+    """Tests person in the efik_NG (Efik - Nigeria) locale"""
+
+    def setUp(self):
+        self.fake = Faker("efik_NG")
+        Faker.seed(0)
+
+    def test_first_name(self):
+        # General first name
+        name = self.fake.first_name()
+        assert isinstance(name, str)
+        assert name in EfikNgProvider.first_names
+
+        # Female first name
+        name_female = self.fake.first_name_female()
+        assert isinstance(name_female, str)
+        assert name_female in EfikNgProvider.first_names
+        assert name_female in EfikNgProvider.first_names_female
+
+        # Male first name
+        name_male = self.fake.first_name_male()
+        assert isinstance(name_male, str)
+        assert name_male in EfikNgProvider.first_names
+        assert name_male in EfikNgProvider.first_names_male
+
+    def test_last_name(self):
+        assert hasattr(EfikNgProvider, "last_names")
+
+        # General last name
+        last = self.fake.last_name()
+        assert isinstance(last, str)
+        assert last in EfikNgProvider.last_names
+
+        # Female last name
+        last_female = self.fake.last_name_female()
+        assert isinstance(last_female, str)
+        assert last_female in EfikNgProvider.last_names
+
+        # Male last name
+        last_male = self.fake.last_name_male()
+        assert isinstance(last_male, str)
+        assert last_male in EfikNgProvider.last_names
+
+    def test_prefix(self):
+        prefix = self.fake.prefix()
+        assert isinstance(prefix, str)
+        assert prefix in EfikNgProvider.prefixes
+
+        prefix_female = self.fake.prefix_female()
+        assert isinstance(prefix_female, str)
+        assert prefix_female in EfikNgProvider.prefixes_female
+
+        prefix_male = self.fake.prefix_male()
+        assert isinstance(prefix_male, str)
+        assert prefix_male in EfikNgProvider.prefixes_male
+
+    def test_full_name(self):
+        name = self.fake.name()
+        assert isinstance(name, str)
+        assert any(first_name in name for first_name in EfikNgProvider.first_names)
+        assert any(last_name in name for last_name in EfikNgProvider.last_names)
 
 
 class TestEn(unittest.TestCase):

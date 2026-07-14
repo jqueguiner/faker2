@@ -50,6 +50,7 @@ class Provider(BaseProvider):
         "Divehi",
         "Dzongkha",
         "Ewe",
+        "Efik",
         "Greek",
         "English",
         "Esperanto",
