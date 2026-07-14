@@ -3,8 +3,8 @@ import unittest
 
 from decimal import Decimal
 
-from faker import Faker
-from faker.providers.geo.pt_PT import Provider as PtPtProvider
+from faker2 import Faker
+from faker2.providers.geo.pt_PT import Provider as PtPtProvider
 
 
 class TestArDz(unittest.TestCase):

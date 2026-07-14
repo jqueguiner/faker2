@@ -2,8 +2,8 @@ from typing import OrderedDict
 
 import pytest
 
-from faker import Faker
-from faker.providers import DynamicProvider
+from faker2 import Faker
+from faker2.providers import DynamicProvider
 
 
 class TestDynamicProvider:

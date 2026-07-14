@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from faker import Faker, Generator
-from faker.factory import Factory
-from faker.generator import random
-from faker.utils import decorators, text
+from faker2 import Faker, Generator
+from faker2.factory import Factory
+from faker2.generator import random
+from faker2.utils import decorators, text
 
 
 class FactoryTestCase(unittest.TestCase):
@@ -18,20 +18,20 @@ class FactoryTestCase(unittest.TestCase):
         self.generator = Generator()
 
     def test_documentor(self):
-        from faker.cli import print_doc
+        from faker2.cli import print_doc
 
         output = io.StringIO()
         print_doc(output=output)
         print_doc("address", output=output)
-        print_doc("faker.providers.person.it_IT", output=output)
+        print_doc("faker2.providers.person.it_IT", output=output)
         assert output.getvalue()
 
     def test_print_provider_handles_non_utf_output(self):
-        from faker.cli import print_provider
+        from faker2.cli import print_provider
 
         doc = MagicMock()
         doc.max_name_len = len("fake.emoji()")
-        doc.get_provider_name.return_value = "faker.providers.emoji"
+        doc.get_provider_name.return_value = "faker2.providers.emoji"
 
         output = io.TextIOWrapper(io.BytesIO(), encoding="cp950")
         print_provider(doc, MagicMock(), {"fake.emoji()": "👩"}, output=output)
@@ -42,36 +42,36 @@ class FactoryTestCase(unittest.TestCase):
         assert "\\U0001f469" in rendered
 
     def test_command(self):
-        from faker.cli import Command
+        from faker2.cli import Command
 
         orig_stdout = sys.stdout
         try:
             sys.stdout = io.StringIO()
-            command = Command(["faker", "address"])
+            command = Command(["faker2", "address"])
             command.execute()
             assert sys.stdout.getvalue()
         finally:
             sys.stdout = orig_stdout
 
     def test_command_custom_provider(self):
-        from faker.cli import Command
+        from faker2.cli import Command
 
         orig_stdout = sys.stdout
         try:
             sys.stdout = io.StringIO()
-            command = Command(["faker", "foo", "-i", "tests.mymodule.en_US"])
+            command = Command(["faker2", "foo", "-i", "tests.mymodule.en_US"])
             command.execute()
             assert sys.stdout.getvalue()
         finally:
             sys.stdout = orig_stdout
 
     def test_cli_seed(self):
-        from faker.cli import Command
+        from faker2.cli import Command
 
         orig_stdout = sys.stdout
         try:
             sys.stdout = io.StringIO()
-            base_args = ["faker", "address"]
+            base_args = ["faker2", "address"]
             target_args = ["--seed", "967"]
             commands = [
                 Command(base_args + target_args),
@@ -87,12 +87,12 @@ class FactoryTestCase(unittest.TestCase):
             sys.stdout = orig_stdout
 
     def test_cli_seed_with_repeat(self):
-        from faker.cli import Command
+        from faker2.cli import Command
 
         orig_stdout = sys.stdout
         try:
             sys.stdout = io.StringIO()
-            base_args = ["faker", "address", "-r", "3"]
+            base_args = ["faker2", "address", "-r", "3"]
             target_args = ["--seed", "967"]
             commands = [
                 Command(base_args + target_args),
@@ -108,12 +108,12 @@ class FactoryTestCase(unittest.TestCase):
             sys.stdout = orig_stdout
 
     def test_cli_verbosity(self):
-        from faker.cli import Command
+        from faker2.cli import Command
 
         orig_stdout = sys.stdout
         try:
             sys.stdout = io.StringIO()
-            base_args = ["faker", "address", "--seed", "769"]
+            base_args = ["faker2", "address", "--seed", "769"]
             target_args = ["-v"]
             commands = [Command(base_args), Command(base_args + target_args)]
             cli_output = [None] * 2
@@ -145,9 +145,9 @@ class FactoryTestCase(unittest.TestCase):
 
     def test_lang_unlocalized_provider(self):
         for locale in (None, "", "en_GB", "it_IT"):
-            factory = Factory.create(providers=["faker.providers.file"], locale=locale)
+            factory = Factory.create(providers=["faker2.providers.file"], locale=locale)
             assert len(factory.providers) == 1
-            assert factory.providers[0].__provider__ == "faker.providers.file"
+            assert factory.providers[0].__provider__ == "faker2.providers.file"
             assert factory.providers[0].__lang__ is None
 
     def test_lang_localized_provider(self, with_default=True):
@@ -171,7 +171,7 @@ class FactoryTestCase(unittest.TestCase):
         provider_path = f"test_lang_localized_provider_{with_default}"
 
         with patch.multiple(
-            "faker.factory",
+            "faker2.factory",
             import_module=MagicMock(return_value=DummyProviderModule()),
             list_module=MagicMock(return_value=("en_GB", "it_IT")),
             DEFAULT_LOCALE="ko_KR",
@@ -188,7 +188,7 @@ class FactoryTestCase(unittest.TestCase):
             for locale, expected_used in test_cases:
                 factory = Factory.create(providers=[provider_path], locale=locale)
                 assert factory.providers[0].__provider__ == provider_path
-                from faker.config import DEFAULT_LOCALE
+                from faker2.config import DEFAULT_LOCALE
 
                 print(f"requested locale = {locale} , DEFAULT LOCALE {DEFAULT_LOCALE}")
                 expected_locale = locale if expected_used else ("ar_EG" if with_default else "ko_KR")
@@ -238,7 +238,7 @@ class FactoryTestCase(unittest.TestCase):
         assert slug == "abcé"
 
     def test_binary(self):
-        from faker.providers.misc import Provider
+        from faker2.providers.misc import Provider
 
         provider = Provider(self.generator)
 
@@ -258,7 +258,7 @@ class FactoryTestCase(unittest.TestCase):
             assert binary1 == binary2
 
     def test_password(self):
-        from faker.providers.misc import Provider
+        from faker2.providers.misc import Provider
 
         provider = Provider(self.generator)
 
@@ -285,7 +285,7 @@ class FactoryTestCase(unittest.TestCase):
                 self.assertIsInstance(fake.suffix(), str)
 
     def test_random_pystr_characters(self):
-        from faker.providers.python import Provider
+        from faker2.providers.python import Provider
 
         provider = Provider(self.generator)
 
@@ -301,7 +301,7 @@ class FactoryTestCase(unittest.TestCase):
         assert len(characters) >= 10
 
     def test_random_pyfloat(self):
-        from faker.providers.python import Provider
+        from faker2.providers.python import Provider
 
         provider = Provider(self.generator)
 
@@ -365,10 +365,10 @@ class FactoryTestCase(unittest.TestCase):
         Passing ``includes`` to ``Factory.create()`` must not permanently
         append to the module-level ``PROVIDERS`` list.
         """
-        from faker.config import PROVIDERS
+        from faker2.config import PROVIDERS
 
         original_length = len(PROVIDERS)
-        Factory.create(includes=["faker.providers.file"])
+        Factory.create(includes=["faker2.providers.file"])
         assert len(PROVIDERS) == original_length
 
     def test_instance_seed_chain(self):

@@ -2,7 +2,7 @@ import re
 
 from typing import Pattern
 
-from faker.providers.passport.it_IT import Provider as ItPassportProvider
+from faker2.providers.passport.it_IT import Provider as ItPassportProvider
 
 
 class TestDeAt:

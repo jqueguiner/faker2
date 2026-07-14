@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from faker.providers.currency.mk_MK import Provider as MkMKCurrencyProvider
+from faker2.providers.currency.mk_MK import Provider as MkMKCurrencyProvider
 
 
 class TestArDz:
@@ -14,7 +14,7 @@ class TestArDz:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.ar_DZ import Provider as ArDzCurrencyProvider
+        from faker2.providers.currency.ar_DZ import Provider as ArDzCurrencyProvider
 
         cls.provider = ArDzCurrencyProvider
 
@@ -32,7 +32,7 @@ class TestAzAz:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.az_AZ import Provider as AzAzCurrencyProvider
+        from faker2.providers.currency.az_AZ import Provider as AzAzCurrencyProvider
 
         cls.provider = AzAzCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -55,7 +55,7 @@ class TestCsCz:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.cs_CZ import Provider as CsCzCurrencyProvider
+        from faker2.providers.currency.cs_CZ import Provider as CsCzCurrencyProvider
 
         cls.provider = CsCzCurrencyProvider
 
@@ -72,7 +72,7 @@ class TestCurrencyProvider:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency import Provider as CurrencyProvider
+        from faker2.providers.currency import Provider as CurrencyProvider
 
         cls.provider = CurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -108,13 +108,13 @@ class TestCurrencyProvider:
             assert isinstance(symbol, str)
             assert symbol in self.provider.currency_symbols.values()
 
-    @patch("faker.providers.currency.Provider.random_element")
+    @patch("faker2.providers.currency.Provider.random_element")
     def test_currency_symbol_with_valid_code(self, mock_random_element, faker):
         symbol = faker.currency_symbol(code="USD")
         assert symbol == "$"
         mock_random_element.assert_not_called()
 
-    @patch("faker.providers.currency.Provider.random_element")
+    @patch("faker2.providers.currency.Provider.random_element")
     def test_currency_symbol_with_invalid_code(self, mock_random_element, faker):
         invalid_code = "FTW"
         with pytest.raises(KeyError):
@@ -150,7 +150,7 @@ class TestDeAt:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.de_AT import Provider as DeAtCurrencyProvider
+        from faker2.providers.currency.de_AT import Provider as DeAtCurrencyProvider
 
         cls.provider = DeAtCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -185,7 +185,7 @@ class TestDeCh:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.de_CH import Provider as DeChCurrencyProvider
+        from faker2.providers.currency.de_CH import Provider as DeChCurrencyProvider
 
         cls.provider = DeChCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -220,7 +220,7 @@ class TestDeDe:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.de_DE import Provider as DeDeCurrencyProvider
+        from faker2.providers.currency.de_DE import Provider as DeDeCurrencyProvider
 
         cls.provider = DeDeCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -255,7 +255,7 @@ class TestElGr:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.el_GR import Provider as ElGrCurrencyProvider
+        from faker2.providers.currency.el_GR import Provider as ElGrCurrencyProvider
 
         cls.provider = ElGrCurrencyProvider
 
@@ -272,7 +272,7 @@ class TestEnAu:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.en_AU import Provider as EnAuCurrencyProvider
+        from faker2.providers.currency.en_AU import Provider as EnAuCurrencyProvider
 
         cls.provider = EnAuCurrencyProvider
 
@@ -289,7 +289,7 @@ class TestEnCa:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.en_CA import Provider as EnCaCurrencyProvider
+        from faker2.providers.currency.en_CA import Provider as EnCaCurrencyProvider
 
         cls.provider = EnCaCurrencyProvider
 
@@ -306,7 +306,7 @@ class TestEsEs:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.es_ES import Provider as EsEsCurrencyProvider
+        from faker2.providers.currency.es_ES import Provider as EsEsCurrencyProvider
 
         cls.provider = EsEsCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -335,7 +335,7 @@ class TestFaIr:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.fa_IR import Provider as FaIrCurrencyProvider
+        from faker2.providers.currency.fa_IR import Provider as FaIrCurrencyProvider
 
         cls.provider = FaIrCurrencyProvider
 
@@ -352,7 +352,7 @@ class TestFrCa:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.fr_CA import Provider as FrCaCurrencyProvider
+        from faker2.providers.currency.fr_CA import Provider as FrCaCurrencyProvider
 
         cls.provider = FrCaCurrencyProvider
 
@@ -369,7 +369,7 @@ class TestFrDz:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.fr_DZ import Provider as FrDzCurrencyProvider
+        from faker2.providers.currency.fr_DZ import Provider as FrDzCurrencyProvider
 
         cls.provider = FrDzCurrencyProvider
 
@@ -387,7 +387,7 @@ class TestFrFr:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.fr_FR import Provider as FrFrCurrencyProvider
+        from faker2.providers.currency.fr_FR import Provider as FrFrCurrencyProvider
 
         cls.provider = FrFrCurrencyProvider
 
@@ -404,7 +404,7 @@ class TestItIt:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.it_IT import Provider as ItItCurrencyProvider
+        from faker2.providers.currency.it_IT import Provider as ItItCurrencyProvider
 
         cls.provider = ItItCurrencyProvider
 
@@ -421,7 +421,7 @@ class TestNgNg:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.ng_NG import Provider as NgNgCurrencyProvider
+        from faker2.providers.currency.ng_NG import Provider as NgNgCurrencyProvider
 
         cls.provider = NgNgCurrencyProvider
 
@@ -438,7 +438,7 @@ class TestNlNl:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.nl_NL import Provider as NlCurrencyProvider
+        from faker2.providers.currency.nl_NL import Provider as NlCurrencyProvider
 
         cls.provider = NlCurrencyProvider
 
@@ -455,7 +455,7 @@ class TestPlPl:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.pl_PL import Provider as PlPlCurrencyProvider
+        from faker2.providers.currency.pl_PL import Provider as PlPlCurrencyProvider
 
         cls.provider = PlPlCurrencyProvider
 
@@ -472,7 +472,7 @@ class TestPtBr:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.pt_BR import Provider as PtBrCurrencyProvider
+        from faker2.providers.currency.pt_BR import Provider as PtBrCurrencyProvider
 
         cls.provider = PtBrCurrencyProvider
 
@@ -489,7 +489,7 @@ class TestRoRo:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.ro_RO import Provider as RoRoCurrencyProvider
+        from faker2.providers.currency.ro_RO import Provider as RoRoCurrencyProvider
 
         cls.provider = RoRoCurrencyProvider
 
@@ -506,7 +506,7 @@ class TestRuRu:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.ru_RU import Provider as RuRuCurrencyProvider
+        from faker2.providers.currency.ru_RU import Provider as RuRuCurrencyProvider
 
         cls.provider = RuRuCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -538,7 +538,7 @@ class TestSkSk:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.sk_SK import Provider as SkSkCurrencyProvider
+        from faker2.providers.currency.sk_SK import Provider as SkSkCurrencyProvider
 
         cls.provider = SkSkCurrencyProvider
 
@@ -555,7 +555,7 @@ class TestSvSe:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.sv_SE import Provider as SvSeCurrencyProvider
+        from faker2.providers.currency.sv_SE import Provider as SvSeCurrencyProvider
 
         cls.provider = SvSeCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -579,7 +579,7 @@ class TestThTh:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.th_TH import Provider as ThThCurrencyProvider
+        from faker2.providers.currency.th_TH import Provider as ThThCurrencyProvider
 
         cls.provider = ThThCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -603,7 +603,7 @@ class TestTrTr:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.tr_TR import Provider as TrTrCurrencyProvider
+        from faker2.providers.currency.tr_TR import Provider as TrTrCurrencyProvider
 
         cls.provider = TrTrCurrencyProvider
 
@@ -618,7 +618,7 @@ class TestUkUa(TestCurrencyProvider):
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.uk_UA import Provider as UkUaCurrencyProvider
+        from faker2.providers.currency.uk_UA import Provider as UkUaCurrencyProvider
 
         cls.provider = UkUaCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -634,7 +634,7 @@ class TestUzUz:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.uz_UZ import Provider as UzUzCurrencyProvider
+        from faker2.providers.currency.uz_UZ import Provider as UzUzCurrencyProvider
 
         cls.provider = UzUzCurrencyProvider
         cls.currencies = cls.provider.currencies
@@ -657,7 +657,7 @@ class TestViVn:
 
     @classmethod
     def setup_class(cls):
-        from faker.providers.currency.vi_VN import Provider as ViVNCurrencyProvider
+        from faker2.providers.currency.vi_VN import Provider as ViVNCurrencyProvider
 
         cls.provider = ViVNCurrencyProvider
         cls.currencies = cls.provider.currencies

@@ -6,38 +6,38 @@ from unittest.mock import patch
 
 import pytest
 
-from faker.providers.company.ar_DZ import Provider as ArDzCompanyProvider
-from faker.providers.company.az_AZ import Provider as AzAzCompanyProvider
-from faker.providers.company.de_AT import Provider as DeAtCompanyProvider
-from faker.providers.company.de_CH import Provider as DeChCompanyProvider
-from faker.providers.company.el_GR import Provider as ElGrCompanyProvider
-from faker.providers.company.en_IN import Provider as EnInCompanyProvider
-from faker.providers.company.en_PH import Provider as EnPhCompanyProvider
-from faker.providers.company.es_ES import Provider as EsEsCompanyProvider
-from faker.providers.company.fil_PH import Provider as FilPhCompanyProvider
-from faker.providers.company.fr_DZ import Provider as FrDzCompanyProvider
-from faker.providers.company.hu_HU import Provider as HuHuCompanyProvider
-from faker.providers.company.hy_AM import Provider as HyAmCompanyProvider
-from faker.providers.company.it_IT import Provider as ItItCompanyProvider
-from faker.providers.company.ja_JP import Provider as JaJpCompanyProvider
-from faker.providers.company.ko_KR import Provider as KoKrCompanyProvider
-from faker.providers.company.mk_MK import Provider as MkMKCompanyProvider
-from faker.providers.company.nl_BE import Provider as NlBeCompanyProvider
-from faker.providers.company.nl_NL import Provider as NlNlCompanyProvider
-from faker.providers.company.pl_PL import Provider as PlPlCompanyProvider
-from faker.providers.company.pl_PL import (
+from faker2.providers.company.ar_DZ import Provider as ArDzCompanyProvider
+from faker2.providers.company.az_AZ import Provider as AzAzCompanyProvider
+from faker2.providers.company.de_AT import Provider as DeAtCompanyProvider
+from faker2.providers.company.de_CH import Provider as DeChCompanyProvider
+from faker2.providers.company.el_GR import Provider as ElGrCompanyProvider
+from faker2.providers.company.en_IN import Provider as EnInCompanyProvider
+from faker2.providers.company.en_PH import Provider as EnPhCompanyProvider
+from faker2.providers.company.es_ES import Provider as EsEsCompanyProvider
+from faker2.providers.company.fil_PH import Provider as FilPhCompanyProvider
+from faker2.providers.company.fr_DZ import Provider as FrDzCompanyProvider
+from faker2.providers.company.hu_HU import Provider as HuHuCompanyProvider
+from faker2.providers.company.hy_AM import Provider as HyAmCompanyProvider
+from faker2.providers.company.it_IT import Provider as ItItCompanyProvider
+from faker2.providers.company.ja_JP import Provider as JaJpCompanyProvider
+from faker2.providers.company.ko_KR import Provider as KoKrCompanyProvider
+from faker2.providers.company.mk_MK import Provider as MkMKCompanyProvider
+from faker2.providers.company.nl_BE import Provider as NlBeCompanyProvider
+from faker2.providers.company.nl_NL import Provider as NlNlCompanyProvider
+from faker2.providers.company.pl_PL import Provider as PlPlCompanyProvider
+from faker2.providers.company.pl_PL import (
     company_vat_checksum,
     local_regon_checksum,
     regon_checksum,
 )
-from faker.providers.company.pt_BR import alphanumeric_company_id_checksum, company_id_checksum
-from faker.providers.company.ro_RO import Provider as RoRoCompanyProvider
-from faker.providers.company.ru_RU import Provider as RuRuCompanyProvider
-from faker.providers.company.ru_RU import calculate_checksum, calculate_snils_checksum
-from faker.providers.company.th_TH import Provider as ThThCompanyProvider
-from faker.providers.company.tr_TR import Provider as TrTrCompanyProvider
-from faker.providers.company.vi_VN import Provider as ViVnCompanyProvider
-from faker.utils.checksums import luhn_checksum
+from faker2.providers.company.pt_BR import alphanumeric_company_id_checksum, company_id_checksum
+from faker2.providers.company.ro_RO import Provider as RoRoCompanyProvider
+from faker2.providers.company.ru_RU import Provider as RuRuCompanyProvider
+from faker2.providers.company.ru_RU import calculate_checksum, calculate_snils_checksum
+from faker2.providers.company.th_TH import Provider as ThThCompanyProvider
+from faker2.providers.company.tr_TR import Provider as TrTrCompanyProvider
+from faker2.providers.company.vi_VN import Provider as ViVnCompanyProvider
+from faker2.utils.checksums import luhn_checksum
 
 
 class TestArDz:

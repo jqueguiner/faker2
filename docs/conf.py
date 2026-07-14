@@ -27,7 +27,7 @@ from datetime import datetime
 extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.intersphinx",
-    "faker.sphinx.autodoc",
+    "faker2.sphinx.autodoc",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -222,7 +222,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [("index", "faker", "Faker Documentation", ["Daniele Faraglia"], 1)]
+man_pages = [("index", "faker2", "Faker Documentation", ["Daniele Faraglia"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False

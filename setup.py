@@ -31,8 +31,8 @@ setup(
     long_description=README,
     long_description_content_type="text/x-rst",
     entry_points={
-        "console_scripts": ["faker=faker.cli:execute_from_command_line"],
-        "pytest11": ["faker = faker.contrib.pytest.plugin"],
+        "console_scripts": ["faker2=faker2.cli:execute_from_command_line"],
+        "pytest11": ["faker = faker2.contrib.pytest.plugin"],
     },
     classifiers=[
         # See https://pypi.org/pypi?%3Aaction=list_classifiers
@@ -64,7 +64,7 @@ setup(
     license="MIT License",
     packages=find_packages(exclude=excluded_packages),
     package_data={
-        "faker": ["py.typed", "proxy.pyi"],
+        "faker2": ["py.typed", "proxy.pyi"],
     },
     platforms=["any"],
     zip_safe=zip_safe,

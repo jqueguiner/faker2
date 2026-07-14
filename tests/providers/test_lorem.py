@@ -2,21 +2,21 @@ import re
 
 import pytest
 
-from faker.providers.lorem.az_AZ import Provider as AzAzLoremProvider
-from faker.providers.lorem.bn_BD import Provider as BnBdLoremProvider
-from faker.providers.lorem.cs_CZ import Provider as CsCzLoremProvider
-from faker.providers.lorem.de_AT import Provider as DeAtLoremProvider
-from faker.providers.lorem.de_DE import Provider as DeDeLoremProvider
-from faker.providers.lorem.en_US import Provider as EnUsLoremProvider
-from faker.providers.lorem.es_AR import Provider as EsArLoremProvider
-from faker.providers.lorem.es_ES import Provider as EsEsLoremProvider
-from faker.providers.lorem.es_MX import Provider as EsMxLoremProvider
-from faker.providers.lorem.fa_IR import Provider as FaIrLoremProvider
-from faker.providers.lorem.it_IT import Provider as ItItLoremProvider
-from faker.providers.lorem.mk_MK import Provider as MkMKLoremProvider
-from faker.providers.lorem.nl_BE import Provider as NlBeLoremProvider
-from faker.providers.lorem.uk_UA import Provider as UkUaLoremProvider
-from faker.providers.lorem.vi_VN import Provider as ViVNLoremProvider
+from faker2.providers.lorem.az_AZ import Provider as AzAzLoremProvider
+from faker2.providers.lorem.bn_BD import Provider as BnBdLoremProvider
+from faker2.providers.lorem.cs_CZ import Provider as CsCzLoremProvider
+from faker2.providers.lorem.de_AT import Provider as DeAtLoremProvider
+from faker2.providers.lorem.de_DE import Provider as DeDeLoremProvider
+from faker2.providers.lorem.en_US import Provider as EnUsLoremProvider
+from faker2.providers.lorem.es_AR import Provider as EsArLoremProvider
+from faker2.providers.lorem.es_ES import Provider as EsEsLoremProvider
+from faker2.providers.lorem.es_MX import Provider as EsMxLoremProvider
+from faker2.providers.lorem.fa_IR import Provider as FaIrLoremProvider
+from faker2.providers.lorem.it_IT import Provider as ItItLoremProvider
+from faker2.providers.lorem.mk_MK import Provider as MkMKLoremProvider
+from faker2.providers.lorem.nl_BE import Provider as NlBeLoremProvider
+from faker2.providers.lorem.uk_UA import Provider as UkUaLoremProvider
+from faker2.providers.lorem.vi_VN import Provider as ViVNLoremProvider
 
 
 class TestAzAz:

@@ -276,7 +276,7 @@ class TestEnCa(_LocaleNorthAmericaMixin):
 
     @staticmethod
     def get_provider_class():
-        from faker.providers.barcode.en_CA import Provider
+        from faker2.providers.barcode.en_CA import Provider
 
         return Provider
 
@@ -288,7 +288,7 @@ class TestEnUs(_LocaleNorthAmericaMixin):
 
     @staticmethod
     def get_provider_class():
-        from faker.providers.barcode.en_US import Provider
+        from faker2.providers.barcode.en_US import Provider
 
         return Provider
 
@@ -300,7 +300,7 @@ class TestEsEs(_LocaleCommonMixin):
 
     @staticmethod
     def get_provider_class():
-        from faker.providers.barcode.es_ES import Provider
+        from faker2.providers.barcode.es_ES import Provider
 
         return Provider
 
@@ -327,7 +327,7 @@ class TestFrCa(_LocaleNorthAmericaMixin):
 
     @staticmethod
     def get_provider_class():
-        from faker.providers.barcode.fr_CA import Provider
+        from faker2.providers.barcode.fr_CA import Provider
 
         return Provider
 
@@ -339,7 +339,7 @@ class TestJaJp(_LocaleCommonMixin):
 
     @staticmethod
     def get_provider_class():
-        from faker.providers.barcode.ja_JP import Provider
+        from faker2.providers.barcode.ja_JP import Provider
 
         return Provider
 

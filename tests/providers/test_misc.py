@@ -25,8 +25,8 @@ from unittest.mock import patch
 
 import pytest
 
-from faker import Faker, exceptions
-from faker.contrib.pytest.plugin import DEFAULT_LOCALE, DEFAULT_SEED
+from faker2 import Faker, exceptions
+from faker2.contrib.pytest.plugin import DEFAULT_LOCALE, DEFAULT_SEED
 
 
 @pytest.fixture(scope="class")
@@ -478,7 +478,7 @@ class TestMiscProvider:
             "delimiter": ";",
             "invalid_kwarg": "invalid_value",
         }
-        with patch("faker.providers.misc.csv.writer") as mock_writer:
+        with patch("faker2.providers.misc.csv.writer") as mock_writer:
             mock_writer.assert_not_called()
             faker.dsv(**test_kwargs)
             assert mock_writer.call_count == 1
@@ -512,7 +512,7 @@ class TestMiscProvider:
             "num_rows": 5,
             "include_row_ids": True,
         }
-        with patch("faker.providers.misc.Provider.dsv") as mock_dsv:
+        with patch("faker2.providers.misc.Provider.dsv") as mock_dsv:
             mock_dsv.assert_not_called()
             faker.csv(**kwargs)
             kwargs["delimiter"] = ","
@@ -525,7 +525,7 @@ class TestMiscProvider:
             "num_rows": 5,
             "include_row_ids": True,
         }
-        with patch("faker.providers.misc.Provider.dsv") as mock_dsv:
+        with patch("faker2.providers.misc.Provider.dsv") as mock_dsv:
             mock_dsv.assert_not_called()
             faker.tsv(**kwargs)
             kwargs["delimiter"] = "\t"
@@ -538,7 +538,7 @@ class TestMiscProvider:
             "num_rows": 5,
             "include_row_ids": True,
         }
-        with patch("faker.providers.misc.Provider.dsv") as mock_dsv:
+        with patch("faker2.providers.misc.Provider.dsv") as mock_dsv:
             mock_dsv.assert_not_called()
             faker.psv(**kwargs)
             kwargs["delimiter"] = "|"

@@ -2,32 +2,32 @@ import re
 
 import pytest
 
-from faker.providers.bank import Provider as BankProvider
-from faker.providers.bank.az_AZ import Provider as AzAzBankProvider
-from faker.providers.bank.cs_CZ import Provider as CsCZBankProvider
-from faker.providers.bank.da_DK import Provider as DaDkBankProvider
-from faker.providers.bank.de_CH import Provider as DeChBankProvider
-from faker.providers.bank.el_GR import Provider as ElGrBankProvider
-from faker.providers.bank.en_GB import Provider as EnGbBankProvider
-from faker.providers.bank.en_IE import Provider as EnIeBankProvider
-from faker.providers.bank.en_IN import Provider as EnInBankProvider
-from faker.providers.bank.en_PH import Provider as EnPhBankProvider
-from faker.providers.bank.es_AR import Provider as EsArBankProvider
-from faker.providers.bank.es_ES import Provider as EsEsBankProvider
-from faker.providers.bank.es_MX import Provider as EsMxBankProvider
-from faker.providers.bank.es_MX import is_valid_clabe
-from faker.providers.bank.fi_FI import Provider as FiFiBankProvider
-from faker.providers.bank.fr_FR import Provider as FrFrBankProvider
-from faker.providers.bank.mk_MK import Provider as MkMKBankProvider
-from faker.providers.bank.nl_BE import Provider as NlBeBankProvider
-from faker.providers.bank.no_NO import Provider as NoNoBankProvider
-from faker.providers.bank.pl_PL import Provider as PlPlBankProvider
-from faker.providers.bank.pt_BR import Provider as PtBrBankProvider
-from faker.providers.bank.pt_PT import Provider as PtPtBankProvider
-from faker.providers.bank.sk_SK import Provider as SkSKBankProvider
-from faker.providers.bank.th_TH import Provider as ThThBankProvider
-from faker.providers.bank.tr_TR import Provider as TrTrBankProvider
-from faker.providers.bank.uk_UA import Provider as UkUaBankProvider
+from faker2.providers.bank import Provider as BankProvider
+from faker2.providers.bank.az_AZ import Provider as AzAzBankProvider
+from faker2.providers.bank.cs_CZ import Provider as CsCZBankProvider
+from faker2.providers.bank.da_DK import Provider as DaDkBankProvider
+from faker2.providers.bank.de_CH import Provider as DeChBankProvider
+from faker2.providers.bank.el_GR import Provider as ElGrBankProvider
+from faker2.providers.bank.en_GB import Provider as EnGbBankProvider
+from faker2.providers.bank.en_IE import Provider as EnIeBankProvider
+from faker2.providers.bank.en_IN import Provider as EnInBankProvider
+from faker2.providers.bank.en_PH import Provider as EnPhBankProvider
+from faker2.providers.bank.es_AR import Provider as EsArBankProvider
+from faker2.providers.bank.es_ES import Provider as EsEsBankProvider
+from faker2.providers.bank.es_MX import Provider as EsMxBankProvider
+from faker2.providers.bank.es_MX import is_valid_clabe
+from faker2.providers.bank.fi_FI import Provider as FiFiBankProvider
+from faker2.providers.bank.fr_FR import Provider as FrFrBankProvider
+from faker2.providers.bank.mk_MK import Provider as MkMKBankProvider
+from faker2.providers.bank.nl_BE import Provider as NlBeBankProvider
+from faker2.providers.bank.no_NO import Provider as NoNoBankProvider
+from faker2.providers.bank.pl_PL import Provider as PlPlBankProvider
+from faker2.providers.bank.pt_BR import Provider as PtBrBankProvider
+from faker2.providers.bank.pt_PT import Provider as PtPtBankProvider
+from faker2.providers.bank.sk_SK import Provider as SkSKBankProvider
+from faker2.providers.bank.th_TH import Provider as ThThBankProvider
+from faker2.providers.bank.tr_TR import Provider as TrTrBankProvider
+from faker2.providers.bank.uk_UA import Provider as UkUaBankProvider
 
 
 def is_valid_iban(iban):

@@ -3,8 +3,8 @@ import inspect
 from unittest import mock
 from unittest.mock import MagicMock
 
-from faker.config import DEFAULT_LOCALE
-from faker.sphinx.docstring import DEFAULT_SAMPLE_SIZE, DEFAULT_SEED, ProviderMethodDocstring, Sample
+from faker2.config import DEFAULT_LOCALE
+from faker2.sphinx.docstring import DEFAULT_SAMPLE_SIZE, DEFAULT_SEED, ProviderMethodDocstring, Sample
 
 
 class TestProviderMethodDocstring:
@@ -23,7 +23,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.sphinx.docstring.ProviderMethodDocString._parse",
+            name="faker2.sphinx.docstring.ProviderMethodDocString._parse",
             obj=MagicMock,
             options=MagicMock(),
             lines=MagicMock(),
@@ -34,7 +34,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=MagicMock(),
@@ -47,7 +47,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.barcode.Provider.upc_a",
+            name="faker2.providers.barcode.Provider.upc_a",
             obj=MagicMock,
             options=MagicMock(),
             lines=MagicMock(),
@@ -60,7 +60,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.automotive.en_PH.Provider.protocol_license_plate",
+            name="faker2.providers.automotive.en_PH.Provider.protocol_license_plate",
             obj=MagicMock,
             options=MagicMock(),
             lines=MagicMock(),
@@ -69,10 +69,10 @@ class TestProviderMethodDocstring:
         assert docstring._method == "protocol_license_plate"
         assert docstring._locale == "en_PH"
 
-    @mock.patch("faker.sphinx.docstring.logger.warning")
+    @mock.patch("faker2.sphinx.docstring.logger.warning")
     def test_log_warning(self, mock_logger_warning):
         path = inspect.getfile(MagicMock)
-        name = "faker.providers.color.Provider"
+        name = "faker2.providers.color.Provider"
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
@@ -109,7 +109,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=[],
@@ -155,7 +155,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=[],
@@ -169,7 +169,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=["lorem"],
@@ -183,7 +183,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=[":sample: a=1"],
@@ -251,7 +251,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=lines,
@@ -276,7 +276,7 @@ class TestProviderMethodDocstring:
         docstring = ProviderMethodDocstring(
             app=MagicMock(),
             what="method",
-            name="faker.providers.BaseProvider.bothify",
+            name="faker2.providers.BaseProvider.bothify",
             obj=MagicMock,
             options=MagicMock(),
             lines=lines,

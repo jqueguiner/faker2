@@ -3,8 +3,8 @@ import re
 
 import pytest
 
-from faker import Faker
-from faker.contrib.pytest.plugin import DEFAULT_SEED
+from faker2 import Faker
+from faker2.contrib.pytest.plugin import DEFAULT_SEED
 
 LOCALE_TEST_CLASS_NAME_REGEX = re.compile(
     r"^Test(?P<language>[A-Z][a-z]{1,2})(?P<region>[A-Z][a-z])$",

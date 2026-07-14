@@ -1,6 +1,6 @@
 import pytest
 
-from faker import Faker
+from faker2 import Faker
 
 
 class TestOptionalClass:

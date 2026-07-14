@@ -1,7 +1,7 @@
 import pytest
 
-from faker.providers.isbn import ISBN10, ISBN13
-from faker.providers.isbn.en_US import Provider as ISBNProvider
+from faker2.providers.isbn import ISBN10, ISBN13
+from faker2.providers.isbn.en_US import Provider as ISBNProvider
 
 
 class TestISBN10:

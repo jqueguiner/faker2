@@ -1,6 +1,6 @@
 import unittest
 
-from faker import Faker
+from faker2 import Faker
 
 
 class TestProfileProvider(unittest.TestCase):

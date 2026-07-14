@@ -12,7 +12,7 @@ from random import Random
 
 import pytest
 
-from faker.contrib.pytest.plugin import DEFAULT_LOCALE
+from faker2.contrib.pytest.plugin import DEFAULT_LOCALE
 
 _CHANGED_SEED = 4761
 

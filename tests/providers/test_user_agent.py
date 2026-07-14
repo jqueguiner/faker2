@@ -5,8 +5,8 @@ from typing import Pattern
 
 from freezegun import freeze_time
 
-from faker import Faker
-from faker.providers.user_agent import Provider as UaProvider
+from faker2 import Faker
+from faker2.providers.user_agent import Provider as UaProvider
 
 
 class TestUserAgentProvider:

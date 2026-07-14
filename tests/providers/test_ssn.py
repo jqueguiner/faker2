@@ -14,33 +14,33 @@ from validators.i18n.es import es_cif as is_cif
 from validators.i18n.es import es_nie as is_nie
 from validators.i18n.es import es_nif as is_nif
 
-from faker import Factory, Faker
-from faker.providers.ssn.el_GR import tin_checksum as gr_tin_checksum
-from faker.providers.ssn.en_CA import checksum as ca_checksum
-from faker.providers.ssn.en_IN import calculate_gstin_checksum
-from faker.providers.ssn.es_CL import rut_check_digit as cl_rut_checksum
-from faker.providers.ssn.es_CO import nit_check_digit
-from faker.providers.ssn.es_MX import curp_checksum as mx_curp_checksum
-from faker.providers.ssn.es_MX import ssn_checksum as mx_ssn_checksum
-from faker.providers.ssn.et_EE import checksum as et_checksum
-from faker.providers.ssn.fi_FI import Provider as fi_Provider
-from faker.providers.ssn.fr_FR import Provider as fr_Provider
-from faker.providers.ssn.fr_FR import calculate_checksum as fr_calculate_checksum
-from faker.providers.ssn.hr_HR import checksum as hr_checksum
-from faker.providers.ssn.it_IT import checksum as it_checksum
-from faker.providers.ssn.lv_LV import Provider as lv_Provider
-from faker.providers.ssn.mk_MK import Provider as MkMKSsnProvider
-from faker.providers.ssn.no_NO import Provider as no_Provider
-from faker.providers.ssn.no_NO import checksum as no_checksum
-from faker.providers.ssn.pl_PL import calculate_month as pl_calculate_mouth
-from faker.providers.ssn.pl_PL import checksum as pl_checksum
-from faker.providers.ssn.pt_BR import checksum as pt_checksum
-from faker.providers.ssn.ro_RO import ssn_checksum as ro_ssn_checksum
-from faker.providers.ssn.ro_RO import vat_checksum as ro_vat_checksum
-from faker.providers.ssn.sr_BA import calculate_checksum as sr_ba_calculate_checksum
-from faker.providers.ssn.uk_UA import Provider as uk_Provider
-from faker.providers.ssn.zh_TW import checksum as tw_checksum
-from faker.utils.checksums import luhn_checksum
+from faker2 import Factory, Faker
+from faker2.providers.ssn.el_GR import tin_checksum as gr_tin_checksum
+from faker2.providers.ssn.en_CA import checksum as ca_checksum
+from faker2.providers.ssn.en_IN import calculate_gstin_checksum
+from faker2.providers.ssn.es_CL import rut_check_digit as cl_rut_checksum
+from faker2.providers.ssn.es_CO import nit_check_digit
+from faker2.providers.ssn.es_MX import curp_checksum as mx_curp_checksum
+from faker2.providers.ssn.es_MX import ssn_checksum as mx_ssn_checksum
+from faker2.providers.ssn.et_EE import checksum as et_checksum
+from faker2.providers.ssn.fi_FI import Provider as fi_Provider
+from faker2.providers.ssn.fr_FR import Provider as fr_Provider
+from faker2.providers.ssn.fr_FR import calculate_checksum as fr_calculate_checksum
+from faker2.providers.ssn.hr_HR import checksum as hr_checksum
+from faker2.providers.ssn.it_IT import checksum as it_checksum
+from faker2.providers.ssn.lv_LV import Provider as lv_Provider
+from faker2.providers.ssn.mk_MK import Provider as MkMKSsnProvider
+from faker2.providers.ssn.no_NO import Provider as no_Provider
+from faker2.providers.ssn.no_NO import checksum as no_checksum
+from faker2.providers.ssn.pl_PL import calculate_month as pl_calculate_mouth
+from faker2.providers.ssn.pl_PL import checksum as pl_checksum
+from faker2.providers.ssn.pt_BR import checksum as pt_checksum
+from faker2.providers.ssn.ro_RO import ssn_checksum as ro_ssn_checksum
+from faker2.providers.ssn.ro_RO import vat_checksum as ro_vat_checksum
+from faker2.providers.ssn.sr_BA import calculate_checksum as sr_ba_calculate_checksum
+from faker2.providers.ssn.uk_UA import Provider as uk_Provider
+from faker2.providers.ssn.zh_TW import checksum as tw_checksum
+from faker2.utils.checksums import luhn_checksum
 
 
 class TestArDz(unittest.TestCase):
@@ -910,7 +910,7 @@ class TestFrCH:
         Faker.seed(0)
 
         with mock.patch(
-            "faker.providers.ssn.fr_CH.Provider.numerify",
+            "faker2.providers.ssn.fr_CH.Provider.numerify",
             return_value=digits,
             autospec=True,
         ):

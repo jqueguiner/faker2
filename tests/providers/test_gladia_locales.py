@@ -12,7 +12,7 @@ from collections import Counter
 
 import pytest
 
-from faker import Faker
+from faker2 import Faker
 
 # locale -> (unicode script name expected in given names, min pool per list)
 NEW_LOCALES = {
@@ -174,7 +174,7 @@ def test_expanded_given_name_pools(locale, min_pool):
 
 def test_ja_jp_kana_and_romaji_are_complete():
     """Every ja_JP name triplet must carry kana + romaji (regression guard)."""
-    from faker.providers.person.ja_JP import Provider
+    from faker2.providers.person.ja_JP import Provider
 
     for attr in ("first_name_male_pairs", "first_name_female_pairs"):
         for entry in getattr(Provider, attr):

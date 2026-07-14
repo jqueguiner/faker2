@@ -10,27 +10,27 @@ import pytest
 from validators import domain as validate_domain
 from validators import email as validate_email
 
-from faker.providers.internet import Provider as InternetProvider
-from faker.providers.internet.az_AZ import Provider as AzAzInternetProvider
-from faker.providers.internet.en_GB import Provider as EnGbInternetProvider
-from faker.providers.internet.es_ES import Provider as EsEsInternetProvider
-from faker.providers.internet.hu_HU import Provider as HuHuInternetProvider
-from faker.providers.internet.mk_MK import Provider as MkMKInternetProvider
-from faker.providers.internet.pl_PL import Provider as PlPlInternetProvider
-from faker.providers.internet.pt_BR import Provider as PtBrInternetProvider
-from faker.providers.internet.ro_RO import Provider as RoRoInternetProvider
-from faker.providers.internet.ru_RU import Provider as RuRuInternetProvider
-from faker.providers.internet.th_TH import Provider as ThThInternetProvider
-from faker.providers.internet.zh_CN import Provider as ZhCnInternetProvider
-from faker.providers.person.ja_JP import Provider as JaPersonProvider
-from faker.utils import text
+from faker2.providers.internet import Provider as InternetProvider
+from faker2.providers.internet.az_AZ import Provider as AzAzInternetProvider
+from faker2.providers.internet.en_GB import Provider as EnGbInternetProvider
+from faker2.providers.internet.es_ES import Provider as EsEsInternetProvider
+from faker2.providers.internet.hu_HU import Provider as HuHuInternetProvider
+from faker2.providers.internet.mk_MK import Provider as MkMKInternetProvider
+from faker2.providers.internet.pl_PL import Provider as PlPlInternetProvider
+from faker2.providers.internet.pt_BR import Provider as PtBrInternetProvider
+from faker2.providers.internet.ro_RO import Provider as RoRoInternetProvider
+from faker2.providers.internet.ru_RU import Provider as RuRuInternetProvider
+from faker2.providers.internet.th_TH import Provider as ThThInternetProvider
+from faker2.providers.internet.zh_CN import Provider as ZhCnInternetProvider
+from faker2.providers.person.ja_JP import Provider as JaPersonProvider
+from faker2.utils import text
 
 
 class TestArAa:
     """Test ar_AA internet provider methods"""
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "اصيل",
     )
     def test_ascii_safe_email(self, faker):
@@ -39,7 +39,7 @@ class TestArAa:
         assert email.split("@")[0] == "asyl"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "اصيل",
     )
     def test_ascii_free_email(self, faker):
@@ -48,7 +48,7 @@ class TestArAa:
         assert email.split("@")[0] == "asyl"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "اصيل",
     )
     def test_ascii_company_email(self, faker):
@@ -66,7 +66,7 @@ class TestAzAz:
     """Test az_AZ internet provider methods"""
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "AğamüşviqƏlövsətov",
     )
     def test_ascii_free_email(self, faker):
@@ -157,7 +157,7 @@ class TestHuHu:
     # fun fact: these two words contain all hungarian accented letters.
     # "Winnie-the-pooh's mirror drill"
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "micimackó.tükörfúrógépe",
     )
     def test_ascii_free_email_accented_character_replacements(self, faker):
@@ -217,7 +217,7 @@ class TestInternetProvider:
             assert safe_domain_name in expected_domains
 
     @patch(
-        "faker.providers.internet.Provider.image_placeholder_services",
+        "faker2.providers.internet.Provider.image_placeholder_services",
         {"https://dummyimage.com/{width}x{height}"},
     )
     def test_image_url(self, faker):
@@ -263,7 +263,7 @@ class TestInternetProvider:
             assert not ip_address(address).is_private
 
     def test_ipv4_caching(self, faker):
-        from faker.providers.internet import _IPv4Constants
+        from faker2.providers.internet import _IPv4Constants
 
         # The extra [None] here is to test code path involving whole IPv4 pool
         for address_class in list(_IPv4Constants._network_classes.keys()) + [None]:
@@ -324,7 +324,7 @@ class TestInternetProvider:
             assert ip_network(address)[0].is_private
 
     def test_ipv4_private_class(self, faker, num_samples):
-        from faker.providers.internet import _IPv4Constants
+        from faker2.providers.internet import _IPv4Constants
 
         for clas in "abc":
             class_network = _IPv4Constants._network_classes[clas]
@@ -339,7 +339,7 @@ class TestInternetProvider:
                 assert class_min <= ip_address(address) <= class_max
 
     def test_ipv4_public_caching(self, faker):
-        from faker.providers.internet import _IPv4Constants
+        from faker2.providers.internet import _IPv4Constants
 
         for address_class in _IPv4Constants._network_classes.keys():
             networks_attr = f"_cached_public_class_{address_class}_networks"
@@ -395,7 +395,7 @@ class TestInternetProvider:
                 assert not ip_network(address)[0].is_private
 
     def test_ipv4_public_class(self, faker, num_samples):
-        from faker.providers.internet import _IPv4Constants
+        from faker2.providers.internet import _IPv4Constants
 
         for clas in "abc":
             class_network = _IPv4Constants._network_classes[clas]
@@ -410,8 +410,8 @@ class TestInternetProvider:
                 assert self.ipv4_pattern.fullmatch(address)
 
     def test_ipv4_distribution_selection(self):
-        from faker.generator import Generator, random
-        from faker.utils.distribution import choices_distribution
+        from faker2.generator import Generator, random
+        from faker2.utils.distribution import choices_distribution
 
         provider = InternetProvider(Generator())
 
@@ -424,10 +424,10 @@ class TestInternetProvider:
         ]
 
         with patch(
-            "faker.providers.internet.choices_distribution",
+            "faker2.providers.internet.choices_distribution",
             wraps=choices_distribution,
         ) as mock_choices_fn:
-            with patch("faker.generator.random.choice", wraps=random.choice) as mock_random_choice:
+            with patch("faker2.generator.random.choice", wraps=random.choice) as mock_random_choice:
                 # If weights argument is valid, only `choices_distribution` should be called
                 provider._random_ipv4_address_from_subnets(subnets, valid_weights)
                 assert mock_choices_fn.call_count == 1
@@ -642,7 +642,7 @@ class TestNlNl:
     """Test nl_NL internet provider methods"""
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "fabiënné",
     )
     def test_ascii_safe_email(self, faker):
@@ -651,7 +651,7 @@ class TestNlNl:
         assert email.split("@")[0] == "fabienne"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "fabiënné",
     )
     def test_ascii_free_email(self, faker):
@@ -660,7 +660,7 @@ class TestNlNl:
         assert email.split("@")[0] == "fabienne"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "fabiënné",
     )
     def test_ascii_company_email(self, faker):
@@ -704,7 +704,7 @@ class TestPtBr:
         assert not tld.startswith(".")
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "VitóriaMagalhães",
     )
     def test_ascii_safe_email_existing(self, faker):
@@ -714,7 +714,7 @@ class TestPtBr:
         assert email.split("@")[0] == "vitoriamagalhaes"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "JoãoVovóMônica",
     )
     def test_ascii_email_new_replacements(self, faker):
@@ -766,7 +766,7 @@ class TestRuRu:
         assert faker.tld() in RuRuInternetProvider.tlds
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "ИванИванов",
     )
     def test_ascii_safe_email(self, faker):
@@ -775,7 +775,7 @@ class TestRuRu:
         assert email.split("@")[0] == "ivanivanov"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "АлександрСмирнов",
     )
     def test_ascii_free_email(self, faker):
@@ -784,7 +784,7 @@ class TestRuRu:
         assert email.split("@")[0] == "aleksandrsmirnov"
 
     @patch(
-        "faker.providers.internet.Provider.user_name",
+        "faker2.providers.internet.Provider.user_name",
         lambda x: "СергейКузнецов",
     )
     def test_ascii_company_email(self, faker):
@@ -832,7 +832,7 @@ class TestZhCn:
         assert len(domain_word) > 1
 
     @patch(
-        "faker.providers.internet.Provider.tld",
+        "faker2.providers.internet.Provider.tld",
         lambda x: "cn",
     )
     def test_domain_name(self, faker):
@@ -896,8 +896,8 @@ class TestZhCn:
             assert domain_parts[-1] in provider.tlds.keys()
             assert domain_parts[0] not in provider.second_level_domains
 
-    @patch("faker.providers.internet.zh_CN.Provider.domain_word")
-    @patch("faker.providers.internet.Provider.tld")
+    @patch("faker2.providers.internet.zh_CN.Provider.domain_word")
+    @patch("faker2.providers.internet.Provider.tld")
     def test_domain_name_two_levels_after_cn_tld(self, mock_tld, mock_domain_word, faker):
         provider = ZhCnInternetProvider(faker)
 
@@ -915,8 +915,8 @@ class TestZhCn:
             assert domain_parts[0] == "li"
             assert mock_domain_word.call_count == 1
 
-    @patch("faker.providers.internet.zh_CN.Provider.domain_word")
-    @patch("faker.providers.internet.Provider.tld")
+    @patch("faker2.providers.internet.zh_CN.Provider.domain_word")
+    @patch("faker2.providers.internet.Provider.tld")
     def test_domain_name_two_levels_after_non_cn_tld(self, mock_tld, mock_domain_word, faker):
         # If tld() does not return cn, domain_word() will be called twice
         mock_domain_word.reset_mock()
@@ -926,8 +926,8 @@ class TestZhCn:
         assert domain_name == "li.li.net"
         assert mock_domain_word.call_count == 2
 
-    @patch("faker.providers.internet.zh_CN.Provider.domain_word")
-    @patch("faker.providers.internet.Provider.tld")
+    @patch("faker2.providers.internet.zh_CN.Provider.domain_word")
+    @patch("faker2.providers.internet.Provider.tld")
     def test_domain_name_more_than_two_levels_after_cn_tld(self, mock_tld, mock_domain_word, faker):
         provider = ZhCnInternetProvider(faker)
 
@@ -935,7 +935,7 @@ class TestZhCn:
         mock_domain_word.return_value = "li"
         for levels in range(3, 10):
             with patch(
-                "faker.providers.internet.zh_CN.Provider.domain_name",
+                "faker2.providers.internet.zh_CN.Provider.domain_name",
                 wraps=faker.domain_name,
             ) as mock_domain_name:
                 mock_tld.reset_mock()
@@ -957,14 +957,14 @@ class TestZhCn:
                 assert mock_domain_word.call_count == levels - 1
                 assert mock_domain_name.call_count == levels - 2
 
-    @patch("faker.providers.internet.zh_CN.Provider.domain_word")
-    @patch("faker.providers.internet.Provider.tld")
+    @patch("faker2.providers.internet.zh_CN.Provider.domain_word")
+    @patch("faker2.providers.internet.Provider.tld")
     def test_domain_name_more_than_two_levels_after_non_cn_tld(self, mock_tld, mock_domain_word, faker):
         mock_tld.return_value = "net"
         mock_domain_word.return_value = "li"
         for levels in range(3, 10):
             with patch(
-                "faker.providers.internet.zh_CN.Provider.domain_name",
+                "faker2.providers.internet.zh_CN.Provider.domain_name",
                 wraps=faker.domain_name,
             ) as mock_domain_name:
                 mock_tld.reset_mock()

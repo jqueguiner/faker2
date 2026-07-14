@@ -12,7 +12,7 @@ from random import Random
 
 import pytest
 
-from faker.contrib.pytest.plugin import DEFAULT_SEED
+from faker2.contrib.pytest.plugin import DEFAULT_SEED
 
 _CHANGED_LOCALE = ["it_IT"]
 

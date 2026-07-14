@@ -4,15 +4,15 @@ import unittest
 from importlib import import_module
 from pathlib import Path
 
-import faker
+import faker2
 
-from faker.config import META_PROVIDERS_MODULES, PROVIDERS
-from faker.generator import random
-from faker.typing import OrderedDictType
-from faker.utils.checksums import calculate_luhn, luhn_checksum
-from faker.utils.datasets import add_ordereddicts
-from faker.utils.distribution import choices_distribution, choices_distribution_unique
-from faker.utils.loading import find_available_locales, find_available_providers, get_path
+from faker2.config import META_PROVIDERS_MODULES, PROVIDERS
+from faker2.generator import random
+from faker2.typing import OrderedDictType
+from faker2.utils.checksums import calculate_luhn, luhn_checksum
+from faker2.utils.datasets import add_ordereddicts
+from faker2.utils.distribution import choices_distribution, choices_distribution_unique
+from faker2.utils.loading import find_available_locales, find_available_providers, get_path
 
 TEST_DIR = Path(__file__).resolve().parent
 
@@ -55,7 +55,7 @@ class UtilsTestCase(unittest.TestCase):
         assert len(set(samples)) == len(samples)
 
     def test_get_path(self):
-        result = get_path(faker)
+        result = get_path(faker2)
         assert isinstance(result, str)
 
     def test_find_available_locales(self):
@@ -70,32 +70,32 @@ class UtilsTestCase(unittest.TestCase):
             map(
                 str,
                 [
-                    "faker.providers.address",
-                    "faker.providers.automotive",
-                    "faker.providers.bank",
-                    "faker.providers.barcode",
-                    "faker.providers.color",
-                    "faker.providers.company",
-                    "faker.providers.credit_card",
-                    "faker.providers.currency",
-                    "faker.providers.date_time",
-                    "faker.providers.doi",
-                    "faker.providers.emoji",
-                    "faker.providers.file",
-                    "faker.providers.geo",
-                    "faker.providers.internet",
-                    "faker.providers.isbn",
-                    "faker.providers.job",
-                    "faker.providers.lorem",
-                    "faker.providers.misc",
-                    "faker.providers.passport",
-                    "faker.providers.person",
-                    "faker.providers.phone_number",
-                    "faker.providers.profile",
-                    "faker.providers.python",
-                    "faker.providers.sbn",
-                    "faker.providers.ssn",
-                    "faker.providers.user_agent",
+                    "faker2.providers.address",
+                    "faker2.providers.automotive",
+                    "faker2.providers.bank",
+                    "faker2.providers.barcode",
+                    "faker2.providers.color",
+                    "faker2.providers.company",
+                    "faker2.providers.credit_card",
+                    "faker2.providers.currency",
+                    "faker2.providers.date_time",
+                    "faker2.providers.doi",
+                    "faker2.providers.emoji",
+                    "faker2.providers.file",
+                    "faker2.providers.geo",
+                    "faker2.providers.internet",
+                    "faker2.providers.isbn",
+                    "faker2.providers.job",
+                    "faker2.providers.lorem",
+                    "faker2.providers.misc",
+                    "faker2.providers.passport",
+                    "faker2.providers.person",
+                    "faker2.providers.phone_number",
+                    "faker2.providers.profile",
+                    "faker2.providers.python",
+                    "faker2.providers.sbn",
+                    "faker2.providers.ssn",
+                    "faker2.providers.user_agent",
                 ],
             )
         )

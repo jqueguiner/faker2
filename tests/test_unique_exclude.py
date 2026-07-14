@@ -1,7 +1,7 @@
 import pytest
 
-from faker import Faker
-from faker.exceptions import UniquenessException
+from faker2 import Faker
+from faker2.exceptions import UniquenessException
 
 
 class TestSelectiveUniqueness:

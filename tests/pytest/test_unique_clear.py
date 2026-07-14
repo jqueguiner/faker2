@@ -5,7 +5,7 @@ def test_unique_clears(testdir):
     testdir.makepyfile(
         """
         import pytest
-        from faker.exceptions import UniquenessException
+        from faker2.exceptions import UniquenessException
 
         NUM_SAMPLES = 100
 

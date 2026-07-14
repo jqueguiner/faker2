@@ -1,4 +1,4 @@
-from faker.utils.text import slugify
+from faker2.utils.text import slugify
 
 
 def test_slugify_converts_to_lowercase_and_hyphens():

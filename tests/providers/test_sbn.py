@@ -1,8 +1,8 @@
 import pytest
 
-from faker.providers.sbn import SBN9
-from faker.providers.sbn.en_US import Provider as SBNProvider
-from faker.providers.sbn.rules import RegistrantRule
+from faker2.providers.sbn import SBN9
+from faker2.providers.sbn.en_US import Provider as SBNProvider
+from faker2.providers.sbn.rules import RegistrantRule
 
 
 class TestISBN9:

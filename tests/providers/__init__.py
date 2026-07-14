@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pytest
 
-from faker.providers import BaseProvider
+from faker2.providers import BaseProvider
 
 
 class TestBaseProvider:

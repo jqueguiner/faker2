@@ -3,18 +3,18 @@ import string
 
 from typing import Pattern
 
-from faker.providers.automotive import calculate_vin_str_weight
-from faker.providers.automotive.de_AT import Provider as DeAtAutomotiveProvider
-from faker.providers.automotive.de_DE import Provider as DeDeAutomotiveProvider
-from faker.providers.automotive.en_IN import Provider as EnInAutomotiveProvider
-from faker.providers.automotive.es_ES import Provider as EsEsAutomotiveProvider
-from faker.providers.automotive.es_MX import Provider as EsMxAutomotiveProvider
-from faker.providers.automotive.mk_MK import Provider as MkMKAutomotiveProvider
-from faker.providers.automotive.ro_RO import Provider as RoRoAutomotiveProvider
-from faker.providers.automotive.ru_RU import Provider as RuRuAutomotiveProvider
-from faker.providers.automotive.sk_SK import Provider as SkSkAutomotiveProvider
-from faker.providers.automotive.tr_TR import Provider as TrTrAutomotiveProvider
-from faker.providers.automotive.uk_UA import Provider as UkUaAutomotiveProvider
+from faker2.providers.automotive import calculate_vin_str_weight
+from faker2.providers.automotive.de_AT import Provider as DeAtAutomotiveProvider
+from faker2.providers.automotive.de_DE import Provider as DeDeAutomotiveProvider
+from faker2.providers.automotive.en_IN import Provider as EnInAutomotiveProvider
+from faker2.providers.automotive.es_ES import Provider as EsEsAutomotiveProvider
+from faker2.providers.automotive.es_MX import Provider as EsMxAutomotiveProvider
+from faker2.providers.automotive.mk_MK import Provider as MkMKAutomotiveProvider
+from faker2.providers.automotive.ro_RO import Provider as RoRoAutomotiveProvider
+from faker2.providers.automotive.ru_RU import Provider as RuRuAutomotiveProvider
+from faker2.providers.automotive.sk_SK import Provider as SkSkAutomotiveProvider
+from faker2.providers.automotive.tr_TR import Provider as TrTrAutomotiveProvider
+from faker2.providers.automotive.uk_UA import Provider as UkUaAutomotiveProvider
 
 
 class _SimpleAutomotiveTestMixin:

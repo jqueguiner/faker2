@@ -6,24 +6,24 @@ from typing import Pattern
 
 import pytest
 
-from faker.providers.color import RandomColor
-from faker.providers.color.az_AZ import Provider as AzAzColorProvider
-from faker.providers.color.bg_BG import Provider as BgBgColorProvider
-from faker.providers.color.cs_CZ import Provider as CsCzColorProvider
-from faker.providers.color.de_AT import Provider as DeAtColorProvider
-from faker.providers.color.de_CH import Provider as DeChColorProvider
-from faker.providers.color.de_DE import Provider as DeDeColorProvider
-from faker.providers.color.el_GR import Provider as ElGrColorProvider
-from faker.providers.color.es_ES import Provider as EsEsColorProvider
-from faker.providers.color.fa_IR import Provider as FaIrColorProvider
-from faker.providers.color.he_IL import Provider as HeILColorProvider
-from faker.providers.color.hy_AM import Provider as HyAmColorProvider
-from faker.providers.color.id_ID import Provider as IdIdColorProvider
-from faker.providers.color.ka_GE import Provider as KaGEColorProvider
-from faker.providers.color.mk_MK import Provider as MkMKColorProvider
-from faker.providers.color.sk_SK import Provider as SkSkColorProvider
-from faker.providers.color.uz_UZ import Provider as UzUzColorProvider
-from faker.providers.color.vi_VN import Provider as ViVNColorProvider
+from faker2.providers.color import RandomColor
+from faker2.providers.color.az_AZ import Provider as AzAzColorProvider
+from faker2.providers.color.bg_BG import Provider as BgBgColorProvider
+from faker2.providers.color.cs_CZ import Provider as CsCzColorProvider
+from faker2.providers.color.de_AT import Provider as DeAtColorProvider
+from faker2.providers.color.de_CH import Provider as DeChColorProvider
+from faker2.providers.color.de_DE import Provider as DeDeColorProvider
+from faker2.providers.color.el_GR import Provider as ElGrColorProvider
+from faker2.providers.color.es_ES import Provider as EsEsColorProvider
+from faker2.providers.color.fa_IR import Provider as FaIrColorProvider
+from faker2.providers.color.he_IL import Provider as HeILColorProvider
+from faker2.providers.color.hy_AM import Provider as HyAmColorProvider
+from faker2.providers.color.id_ID import Provider as IdIdColorProvider
+from faker2.providers.color.ka_GE import Provider as KaGEColorProvider
+from faker2.providers.color.mk_MK import Provider as MkMKColorProvider
+from faker2.providers.color.sk_SK import Provider as SkSkColorProvider
+from faker2.providers.color.uz_UZ import Provider as UzUzColorProvider
+from faker2.providers.color.vi_VN import Provider as ViVNColorProvider
 
 
 class TestAzAz:

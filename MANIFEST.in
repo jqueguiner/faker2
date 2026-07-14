@@ -7,10 +7,10 @@ include VERSION
 include CITATION.cff
 include mypy.ini
 include tox.ini
-include faker/proxy.pyi
+include faker2/proxy.pyi
 recursive-include tests *.json
 recursive-include tests *.py
-recursive-exclude faker/sphinx *.py
+recursive-exclude faker2/sphinx *.py
 recursive-exclude tests/sphinx *.py
 
 global-exclude *.py[cod] __pycache__ *.so

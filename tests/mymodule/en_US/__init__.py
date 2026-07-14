@@ -1,4 +1,4 @@
-from faker.providers import BaseProvider
+from faker2.providers import BaseProvider
 
 
 class Provider(BaseProvider):

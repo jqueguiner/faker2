@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from faker import Faker
+from faker2 import Faker
 
 
 @pytest.mark.parametrize("object_type", (None, bool, str, float, int, tuple, set, list, Iterable, dict))
@@ -56,7 +56,7 @@ def test_pyfloat_right_and_left_digits_positive(mock_random_number_source, right
     def mock_random_number(self, digits=None, fix_len=False):
         return int(mock_random_number_source[: digits or 1])
 
-    with patch("faker.providers.BaseProvider.random_number", mock_random_number):
+    with patch("faker2.providers.BaseProvider.random_number", mock_random_number):
         result = Faker().pyfloat(left_digits=1, right_digits=right_digits, positive=True)
         decimal_part = str(result).split(".")[1]
         assert decimal_part == expected_decimal_part
@@ -74,8 +74,8 @@ def test_pyfloat_right_or_left_digit_overflow():
     def mock_random_number(self, digits=None, fix_len=False):
         return int("12345678901234567890"[: digits or 1])
 
-    with patch("faker.providers.BaseProvider.random_int", mock_random_int):
-        with patch("faker.providers.BaseProvider.random_number", mock_random_number):
+    with patch("faker2.providers.BaseProvider.random_int", mock_random_int):
+        with patch("faker2.providers.BaseProvider.random_number", mock_random_number):
             # A bit too much, but ~half on either side
             with pytest.raises(ValueError, match="Asking for too many digits"):
                 faker.pyfloat(
@@ -514,7 +514,7 @@ class TestPyfloat(unittest.TestCase):
         def mock_random_number(self, digits=None, fix_len=False):
             return 5
 
-        with patch("faker.providers.BaseProvider.random_number", mock_random_number):
+        with patch("faker2.providers.BaseProvider.random_number", mock_random_number):
             result = self.fake.pyfloat(positive=True, max_value=0.1)
             self.assertLessEqual(result, 0.1)
             self.assertGreater(result, 0)
@@ -626,7 +626,7 @@ class TestPystrFormat(unittest.TestCase):
 
     def test_formatter_invocation(self):
         with patch.object(self.fake["en_US"].factories[0], "foo") as mock_foo:
-            with patch("faker.providers.BaseProvider.bothify", wraps=self.fake.bothify) as mock_bothify:
+            with patch("faker2.providers.BaseProvider.bothify", wraps=self.fake.bothify) as mock_bothify:
                 mock_foo.return_value = "barbar"
                 value = self.fake.pystr_format("{{foo}}?#?{{foo}}?#?{{foo}}", letters="abcde")
                 assert value.count("barbar") == 3
@@ -705,7 +705,7 @@ class TestPython(unittest.TestCase):
         def mock_pyint(self, *args, **kwargs):
             return 1
 
-        with patch("faker.providers.python.Provider.pyint", mock_pyint):
+        with patch("faker2.providers.python.Provider.pyint", mock_pyint):
             some_tuple = Faker().pytuple(nb_elements=3, variable_nb_elements=False, value_types=[int])
             assert some_tuple == (1, 1, 1)
 

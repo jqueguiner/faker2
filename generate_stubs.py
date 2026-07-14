@@ -5,10 +5,10 @@ import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, get_overloads, get_type_hints
 
-import faker.proxy
+import faker2.proxy
 
-from faker import Factory, Faker
-from faker.config import AVAILABLE_LOCALES, PROVIDERS
+from faker2 import Factory, Faker
+from faker2.config import AVAILABLE_LOCALES, PROVIDERS
 
 BUILTIN_MODULES_TO_IGNORE = ["builtins"]
 GENERIC_MANGLE_TYPES_TO_IGNORE = ["builtin_function_or_method", "mappingproxy"]
@@ -21,8 +21,8 @@ imports["json"] = {"encoder"}
 imports["typing"] = {"Callable", "Collection", "TypeVar", "overload"}
 imports["uuid"] = {"UUID"}
 imports["enum"] = {"Enum"}
-imports["faker.typing"] = {"*"}
-imports["faker.generator"] = {"Generator"}
+imports["faker2.typing"] = {"*"}
+imports["faker2.generator"] = {"Generator"}
 
 
 def get_module_and_member_to_import(cls: Type, locale: Optional[str] = None) -> Tuple[str, str]:
@@ -36,7 +36,7 @@ def get_module_and_member_to_import(cls: Type, locale: Optional[str] = None) -> 
         else:
             unqualified_type = re.findall(r"[^\.a-zA-Z0-9_]([A-Z][a-zA-Z0-9_]+)[^\.a-zA-Z0-9_]", f" {cls} ")
             if len(unqualified_type) > 0 and unqualified_type[0] != "NoneType":
-                cls_str = str(cls).replace(".en_US", "").replace("faker.", ".")
+                cls_str = str(cls).replace(".en_US", "").replace("faker2.", ".")
                 if "<class '" in cls_str:
                     cls_str = cls_str.split("'")[1]
                 if locale is not None:
@@ -173,7 +173,7 @@ def get_signatures_for_func(func_value, func_name, locale, is_overload: bool = F
 classes_and_locales_to_use_for_stub: List[Tuple[object, str]] = []
 for locale in AVAILABLE_LOCALES:
     for provider in PROVIDERS:
-        if provider == "faker.providers":
+        if provider == "faker2.providers":
             continue
         prov_cls, _, _ = Factory._find_provider_class(provider, locale)
         classes_and_locales_to_use_for_stub.append((prov_cls, locale))
@@ -231,7 +231,7 @@ class Faker:
 {member_signatures_block}
 """
 
-faker_proxy_path = pathlib.Path(inspect.getfile(faker.proxy))
+faker_proxy_path = pathlib.Path(inspect.getfile(faker2.proxy))
 stub_file_path = faker_proxy_path.with_name("proxy.pyi").resolve()
 with open(stub_file_path, "w", encoding="utf-8") as fh:
     fh.write(body)

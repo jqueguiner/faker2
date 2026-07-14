@@ -5,63 +5,63 @@ from unittest import mock
 
 import pytest
 
-from faker import Faker, providers
-from faker.providers.address.ar_DZ import Provider as ArDzAddressProvider
-from faker.providers.address.az_AZ import Provider as AzAzAddressProvider
-from faker.providers.address.cs_CZ import Provider as CsCzAddressProvider
-from faker.providers.address.da_DK import Provider as DaDkAddressProvider
-from faker.providers.address.de_AT import Provider as DeAtAddressProvider
-from faker.providers.address.de_CH import Provider as DeChAddressProvider
-from faker.providers.address.de_DE import Provider as DeDeAddressProvider
-from faker.providers.address.el_GR import Provider as ElGrAddressProvider
-from faker.providers.address.en_AU import Provider as EnAuAddressProvider
-from faker.providers.address.en_BD import Provider as EnBdAddressProvider
-from faker.providers.address.en_CA import Provider as EnCaAddressProvider
-from faker.providers.address.en_GB import Provider as EnGbAddressProvider
-from faker.providers.address.en_IE import Provider as EnIeAddressProvider
-from faker.providers.address.en_IN import Provider as EnInAddressProvider
-from faker.providers.address.en_MS import Provider as EnMsAddressProvider
-from faker.providers.address.en_NZ import Provider as EnNzAddressProvider
-from faker.providers.address.en_PH import Provider as EnPhAddressProvider
-from faker.providers.address.en_US import Provider as EnUsAddressProvider
-from faker.providers.address.es_CO import Provider as EsCoAddressProvider
-from faker.providers.address.es_ES import Provider as EsEsAddressProvider
-from faker.providers.address.es_MX import Provider as EsMxAddressProvider
-from faker.providers.address.fa_IR import Provider as FaIrAddressProvider
-from faker.providers.address.fi_FI import Provider as FiFiAddressProvider
-from faker.providers.address.fr_CA import Provider as FrCaAddressProvider
-from faker.providers.address.fr_CH import Provider as FrChAddressProvider
-from faker.providers.address.fr_DZ import Provider as FrDzAddressProvider
-from faker.providers.address.fr_FR import Provider as FrFrAddressProvider
-from faker.providers.address.he_IL import Provider as HeIlAddressProvider
-from faker.providers.address.hi_IN import Provider as HiInAddressProvider
-from faker.providers.address.hr_HR import Provider as HrHrAddressProvider
-from faker.providers.address.hu_HU import Provider as HuHuAddressProvider
-from faker.providers.address.hy_AM import Provider as HyAmAddressProvider
-from faker.providers.address.id_ID import Provider as IdIdAddressProvider
-from faker.providers.address.it_IT import Provider as ItItAddressProvider
-from faker.providers.address.ja_JP import Provider as JaJpAddressProvider
-from faker.providers.address.ka_GE import Provider as KaGeAddressProvider
-from faker.providers.address.ko_KR import Provider as KoKrAddressProvider
-from faker.providers.address.mk_MK import Provider as MkMKAddressProvider
-from faker.providers.address.mr_IN import Provider as MrInAddressProvider
-from faker.providers.address.ne_NP import Provider as NeNpAddressProvider
-from faker.providers.address.no_NO import Provider as NoNoAddressProvider
-from faker.providers.address.pl_PL import Provider as PlPlAddressProvider
-from faker.providers.address.pt_BR import Provider as PtBrAddressProvider
-from faker.providers.address.pt_PT import Provider as PtPtAddressProvider
-from faker.providers.address.ro_RO import Provider as RoRoAddressProvider
-from faker.providers.address.ru_RU import Provider as RuRuAddressProvider
-from faker.providers.address.sk_SK import Provider as SkSkAddressProvider
-from faker.providers.address.sl_SI import Provider as SlSiAddressProvider
-from faker.providers.address.sv_SE import Provider as SvSeAddressProvider
-from faker.providers.address.ta_IN import Provider as TaInAddressProvider
-from faker.providers.address.th_TH import Provider as ThThAddressProvider
-from faker.providers.address.uk_UA import Provider as UkUaAddressProvider
-from faker.providers.address.vi_VN import Provider as ViVNAddressProvider
-from faker.providers.address.zh_CN import Provider as ZhCnAddressProvider
-from faker.providers.address.zh_TW import Provider as ZhTwAddressProvider
-from faker.providers.address.zu_ZA import Provider as ZuZaAddressProvider
+from faker2 import Faker, providers
+from faker2.providers.address.ar_DZ import Provider as ArDzAddressProvider
+from faker2.providers.address.az_AZ import Provider as AzAzAddressProvider
+from faker2.providers.address.cs_CZ import Provider as CsCzAddressProvider
+from faker2.providers.address.da_DK import Provider as DaDkAddressProvider
+from faker2.providers.address.de_AT import Provider as DeAtAddressProvider
+from faker2.providers.address.de_CH import Provider as DeChAddressProvider
+from faker2.providers.address.de_DE import Provider as DeDeAddressProvider
+from faker2.providers.address.el_GR import Provider as ElGrAddressProvider
+from faker2.providers.address.en_AU import Provider as EnAuAddressProvider
+from faker2.providers.address.en_BD import Provider as EnBdAddressProvider
+from faker2.providers.address.en_CA import Provider as EnCaAddressProvider
+from faker2.providers.address.en_GB import Provider as EnGbAddressProvider
+from faker2.providers.address.en_IE import Provider as EnIeAddressProvider
+from faker2.providers.address.en_IN import Provider as EnInAddressProvider
+from faker2.providers.address.en_MS import Provider as EnMsAddressProvider
+from faker2.providers.address.en_NZ import Provider as EnNzAddressProvider
+from faker2.providers.address.en_PH import Provider as EnPhAddressProvider
+from faker2.providers.address.en_US import Provider as EnUsAddressProvider
+from faker2.providers.address.es_CO import Provider as EsCoAddressProvider
+from faker2.providers.address.es_ES import Provider as EsEsAddressProvider
+from faker2.providers.address.es_MX import Provider as EsMxAddressProvider
+from faker2.providers.address.fa_IR import Provider as FaIrAddressProvider
+from faker2.providers.address.fi_FI import Provider as FiFiAddressProvider
+from faker2.providers.address.fr_CA import Provider as FrCaAddressProvider
+from faker2.providers.address.fr_CH import Provider as FrChAddressProvider
+from faker2.providers.address.fr_DZ import Provider as FrDzAddressProvider
+from faker2.providers.address.fr_FR import Provider as FrFrAddressProvider
+from faker2.providers.address.he_IL import Provider as HeIlAddressProvider
+from faker2.providers.address.hi_IN import Provider as HiInAddressProvider
+from faker2.providers.address.hr_HR import Provider as HrHrAddressProvider
+from faker2.providers.address.hu_HU import Provider as HuHuAddressProvider
+from faker2.providers.address.hy_AM import Provider as HyAmAddressProvider
+from faker2.providers.address.id_ID import Provider as IdIdAddressProvider
+from faker2.providers.address.it_IT import Provider as ItItAddressProvider
+from faker2.providers.address.ja_JP import Provider as JaJpAddressProvider
+from faker2.providers.address.ka_GE import Provider as KaGeAddressProvider
+from faker2.providers.address.ko_KR import Provider as KoKrAddressProvider
+from faker2.providers.address.mk_MK import Provider as MkMKAddressProvider
+from faker2.providers.address.mr_IN import Provider as MrInAddressProvider
+from faker2.providers.address.ne_NP import Provider as NeNpAddressProvider
+from faker2.providers.address.no_NO import Provider as NoNoAddressProvider
+from faker2.providers.address.pl_PL import Provider as PlPlAddressProvider
+from faker2.providers.address.pt_BR import Provider as PtBrAddressProvider
+from faker2.providers.address.pt_PT import Provider as PtPtAddressProvider
+from faker2.providers.address.ro_RO import Provider as RoRoAddressProvider
+from faker2.providers.address.ru_RU import Provider as RuRuAddressProvider
+from faker2.providers.address.sk_SK import Provider as SkSkAddressProvider
+from faker2.providers.address.sl_SI import Provider as SlSiAddressProvider
+from faker2.providers.address.sv_SE import Provider as SvSeAddressProvider
+from faker2.providers.address.ta_IN import Provider as TaInAddressProvider
+from faker2.providers.address.th_TH import Provider as ThThAddressProvider
+from faker2.providers.address.uk_UA import Provider as UkUaAddressProvider
+from faker2.providers.address.vi_VN import Provider as ViVNAddressProvider
+from faker2.providers.address.zh_CN import Provider as ZhCnAddressProvider
+from faker2.providers.address.zh_TW import Provider as ZhTwAddressProvider
+from faker2.providers.address.zu_ZA import Provider as ZuZaAddressProvider
 
 
 class TestArDz:
@@ -216,7 +216,7 @@ class TestBaseProvider:
         ):
             Faker("en_US").current_country()
         assert "Ambiguous" in str(e)
-        country_code = "faker.providers.address.Provider.current_country_code"
+        country_code = "faker2.providers.address.Provider.current_country_code"
         with (
             pytest.raises(ValueError),
             mock.patch(country_code, lambda self: "en_ZZ"),
@@ -2469,12 +2469,12 @@ class TestRuRu:
         the case of suffixes and streets that have been randomly selected.
         """
         title_patch = mock.patch(
-            "faker.providers.address.ru_RU.Provider.street_title",
+            "faker2.providers.address.ru_RU.Provider.street_title",
             autospec=True,
             return_value=street_title,
         )
         suffix_patch = mock.patch(
-            "faker.providers.address.ru_RU.Provider.street_suffix",
+            "faker2.providers.address.ru_RU.Provider.street_suffix",
             autospec=True,
             return_value=street_suffix,
         )

@@ -2,9 +2,9 @@ import re
 
 from typing import Pattern
 
-from faker.providers.bank.ru_RU import Provider as RuRuBankProvider
-from faker.providers.bank.uk_UA import Provider as UkUaBankProvider
-from faker.providers.credit_card import Provider as CreditCardProvider
+from faker2.providers.bank.ru_RU import Provider as RuRuBankProvider
+from faker2.providers.bank.uk_UA import Provider as UkUaBankProvider
+from faker2.providers.credit_card import Provider as CreditCardProvider
 
 
 class TestCreditCardProvider:

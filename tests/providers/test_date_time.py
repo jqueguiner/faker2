@@ -14,43 +14,43 @@ from datetime import timedelta, tzinfo
 import freezegun
 import pytest
 
-from faker import Faker
-from faker.providers.date_time import Provider as DatetimeProvider
-from faker.providers.date_time import change_year
-from faker.providers.date_time.ar_AA import Provider as ArProvider
-from faker.providers.date_time.ar_DZ import Provider as DzProvider
-from faker.providers.date_time.ar_EG import Provider as EgProvider
-from faker.providers.date_time.az_AZ import Provider as AzAzProvider
-from faker.providers.date_time.bn_BD import Provider as BnBdProvider
-from faker.providers.date_time.cs_CZ import Provider as CsCzProvider
-from faker.providers.date_time.de_AT import Provider as DeAtProvider
-from faker.providers.date_time.de_DE import Provider as DeDeProvider
-from faker.providers.date_time.el_GR import Provider as ElGrProvider
-from faker.providers.date_time.es_ES import Provider as EsEsProvider
-from faker.providers.date_time.fr_DZ import Provider as FrDzProvider
-from faker.providers.date_time.fr_FR import Provider as FrFrProvider
-from faker.providers.date_time.gu_IN import Provider as GuINProvider
-from faker.providers.date_time.hy_AM import Provider as HyAmProvider
-from faker.providers.date_time.it_IT import Provider as ItItProvider
-from faker.providers.date_time.ja_JP import Provider as JaJpProvider
-from faker.providers.date_time.ka_GE import Provider as KaGeProvider
-from faker.providers.date_time.mk_MK import Provider as MkMKProvider
-from faker.providers.date_time.mr_IN import Provider as MrINProvider
-from faker.providers.date_time.nl_NL import Provider as NlProvider
-from faker.providers.date_time.no_NO import Provider as NoNoProvider
-from faker.providers.date_time.pl_PL import Provider as PlProvider
-from faker.providers.date_time.pt_BR import Provider as PtBrProvider
-from faker.providers.date_time.pt_PT import Provider as PtPtProvider
-from faker.providers.date_time.ro_RO import Provider as RoRoProvider
-from faker.providers.date_time.ru_RU import Provider as RuProvider
-from faker.providers.date_time.sk_SK import Provider as SkSkProvider
-from faker.providers.date_time.sl_SI import Provider as SlSiProvider
-from faker.providers.date_time.ta_IN import Provider as TaInProvider
-from faker.providers.date_time.tr_TR import Provider as TrTrProvider
-from faker.providers.date_time.uz_UZ import Provider as UzUzProvider
-from faker.providers.date_time.vi_VN import Provider as ViVNProvider
-from faker.providers.date_time.zh_CN import Provider as ZhCnProvider
-from faker.providers.date_time.zh_TW import Provider as ZhTwProvider
+from faker2 import Faker
+from faker2.providers.date_time import Provider as DatetimeProvider
+from faker2.providers.date_time import change_year
+from faker2.providers.date_time.ar_AA import Provider as ArProvider
+from faker2.providers.date_time.ar_DZ import Provider as DzProvider
+from faker2.providers.date_time.ar_EG import Provider as EgProvider
+from faker2.providers.date_time.az_AZ import Provider as AzAzProvider
+from faker2.providers.date_time.bn_BD import Provider as BnBdProvider
+from faker2.providers.date_time.cs_CZ import Provider as CsCzProvider
+from faker2.providers.date_time.de_AT import Provider as DeAtProvider
+from faker2.providers.date_time.de_DE import Provider as DeDeProvider
+from faker2.providers.date_time.el_GR import Provider as ElGrProvider
+from faker2.providers.date_time.es_ES import Provider as EsEsProvider
+from faker2.providers.date_time.fr_DZ import Provider as FrDzProvider
+from faker2.providers.date_time.fr_FR import Provider as FrFrProvider
+from faker2.providers.date_time.gu_IN import Provider as GuINProvider
+from faker2.providers.date_time.hy_AM import Provider as HyAmProvider
+from faker2.providers.date_time.it_IT import Provider as ItItProvider
+from faker2.providers.date_time.ja_JP import Provider as JaJpProvider
+from faker2.providers.date_time.ka_GE import Provider as KaGeProvider
+from faker2.providers.date_time.mk_MK import Provider as MkMKProvider
+from faker2.providers.date_time.mr_IN import Provider as MrINProvider
+from faker2.providers.date_time.nl_NL import Provider as NlProvider
+from faker2.providers.date_time.no_NO import Provider as NoNoProvider
+from faker2.providers.date_time.pl_PL import Provider as PlProvider
+from faker2.providers.date_time.pt_BR import Provider as PtBrProvider
+from faker2.providers.date_time.pt_PT import Provider as PtPtProvider
+from faker2.providers.date_time.ro_RO import Provider as RoRoProvider
+from faker2.providers.date_time.ru_RU import Provider as RuProvider
+from faker2.providers.date_time.sk_SK import Provider as SkSkProvider
+from faker2.providers.date_time.sl_SI import Provider as SlSiProvider
+from faker2.providers.date_time.ta_IN import Provider as TaInProvider
+from faker2.providers.date_time.tr_TR import Provider as TrTrProvider
+from faker2.providers.date_time.uz_UZ import Provider as UzUzProvider
+from faker2.providers.date_time.vi_VN import Provider as ViVNProvider
+from faker2.providers.date_time.zh_CN import Provider as ZhCnProvider
+from faker2.providers.date_time.zh_TW import Provider as ZhTwProvider
 
 
 def is64bit():
@@ -228,7 +228,7 @@ class TestDateTime(unittest.TestCase):
         assert DatetimeProvider._parse_date(timedelta(days=30)) == parsed
 
     def test_timezone_conversion(self):
-        from faker.providers.date_time import datetime_to_timestamp
+        from faker2.providers.date_time import datetime_to_timestamp
 
         now = datetime.now(utc).replace(microsecond=0)
         timestamp = datetime_to_timestamp(now)
@@ -547,7 +547,7 @@ class TestDateTime(unittest.TestCase):
         self.assertBetween(random_date, _9_months_ago, _2_months_ago)
 
     def test_parse_timedelta(self):
-        from faker.providers.date_time import Provider
+        from faker2.providers.date_time import Provider
 
         td = timedelta(days=7)
         seconds = Provider._parse_timedelta(td)
@@ -597,7 +597,7 @@ class TestDateTime(unittest.TestCase):
         assert series[0][0] == start
 
     def test_unix_time(self):
-        from faker.providers.date_time import datetime_to_timestamp
+        from faker2.providers.date_time import datetime_to_timestamp
 
         for _ in range(100):
             now = datetime.now().replace(microsecond=0)
@@ -754,7 +754,7 @@ class TestFilPh(unittest.TestCase):
         Faker.seed(0)
 
     def setup_constants(self):
-        from faker.providers.date_time.fil_PH import Provider
+        from faker2.providers.date_time.fil_PH import Provider
 
         self.day_names = Provider.DAY_NAMES.values()
         self.month_names = Provider.MONTH_NAMES.values()

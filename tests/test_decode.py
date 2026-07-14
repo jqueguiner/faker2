@@ -1,6 +1,6 @@
 import pytest
 
-from faker.decode import unidecode
+from faker2.decode import unidecode
 
 
 @pytest.mark.parametrize(
