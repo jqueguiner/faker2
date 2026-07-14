@@ -1,6 +1,6 @@
 from string import ascii_uppercase, digits
 
-from .. import Provider as BankProvider
+from ..en_GB import Provider as BankProvider
 
 
 class Provider(BankProvider):

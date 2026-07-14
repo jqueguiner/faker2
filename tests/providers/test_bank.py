@@ -216,6 +216,15 @@ class TestEnIn:
             assert regex.fullmatch(ifsc) is not None
             assert ifsc[:4] in EnInBankProvider.ifsc_bank_codes
 
+    def test_bban(self, faker, num_samples):
+        for _ in range(num_samples):
+            assert re.fullmatch(r"[A-Z]{4}\d{14}", faker.bban())
+
+    def test_iban(self, faker, num_samples):
+        for _ in range(num_samples):
+            iban = faker.iban()
+            assert is_valid_iban(iban)
+
 
 class TestEnPh:
     """Test en_PH bank provider"""
