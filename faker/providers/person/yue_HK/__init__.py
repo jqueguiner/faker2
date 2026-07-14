@@ -1,0 +1,188 @@
+from collections import OrderedDict
+
+from .. import Provider as PersonProvider
+
+
+class Provider(PersonProvider):
+    # Cantonese (yue), Hong Kong — Traditional Chinese script (繁體中文)
+    # Han naming convention: surname first, then given name, written with no space.
+
+    formats_female = OrderedDict(
+        (("{{last_name}}{{first_name_female}}", 1.0),)  # 漢人 Han
+    )
+
+    formats_male = OrderedDict(
+        (("{{last_name}}{{first_name_male}}", 1.0),)  # 漢人 Han
+    )
+
+    formats = formats_male.copy()
+    formats.update(formats_female)
+
+    # =============================================================================
+    # 男性名字 (male given names)
+    first_names_male = (
+        "志明",
+        "家豪",
+        "嘉豪",
+        "俊傑",
+        "偉強",
+        "志偉",
+        "家俊",
+        "建華",
+        "德華",
+        "學友",
+        "家榮",
+        "兆基",
+        "國棟",
+        "永康",
+        "子軒",
+        "浩然",
+        "家軒",
+        "俊賢",
+        "偉業",
+        "志強",
+        "家明",
+        "天佑",
+        "皓文",
+        "卓賢",
+        "展鵬",
+        "嘉樂",
+        "樂天",
+        "銘軒",
+        "俊軒",
+        "家聰",
+        "偉倫",
+        "志豪",
+        "家寶",
+        "錦榮",
+        "國強",
+        "榮基",
+        "世昌",
+        "文傑",
+        "浩軒",
+        "嘉俊",
+        "子傑",
+        "家偉",
+        "志聰",
+        "偉豪",
+        "俊文",
+    )
+
+    # 女性名字 (female given names)
+    first_names_female = (
+        "美玲",
+        "淑儀",
+        "婉婷",
+        "麗珊",
+        "嘉欣",
+        "詠芝",
+        "曉彤",
+        "佩珊",
+        "慧珊",
+        "家欣",
+        "麗華",
+        "淑芬",
+        "詠儀",
+        "敏儀",
+        "樂瑤",
+        "靜宜",
+        "芷晴",
+        "若琳",
+        "嘉雯",
+        "美儀",
+        "穎詩",
+        "雅文",
+        "婉儀",
+        "秀英",
+        "麗娟",
+        "惠芳",
+        "淑貞",
+        "嘉琳",
+        "詩雅",
+        "心怡",
+        "曉琳",
+        "詠珊",
+        "家怡",
+        "佩雯",
+        "慧敏",
+        "潔瑩",
+        "寶儀",
+        "麗萍",
+        "美珍",
+        "雅婷",
+        "芷若",
+        "詩琪",
+        "嘉敏",
+        "曉晴",
+        "婉盈",
+    )
+
+    first_names = first_names_male + first_names_female
+
+    # 姓氏 (surnames) — most common Hong Kong surnames
+    last_names = (
+        "陳",
+        "黃",
+        "李",
+        "張",
+        "梁",
+        "何",
+        "劉",
+        "麥",
+        "周",
+        "鄧",
+        "林",
+        "楊",
+        "吳",
+        "徐",
+        "朱",
+        "馬",
+        "胡",
+        "郭",
+        "高",
+        "羅",
+        "鄭",
+        "曾",
+        "蔡",
+        "潘",
+        "謝",
+        "蕭",
+        "盧",
+        "譚",
+        "姚",
+        "葉",
+        "蘇",
+        "余",
+        "杜",
+        "施",
+        "龔",
+        "湯",
+        "韓",
+        "江",
+        "尹",
+        "岑",
+        "關",
+        "唐",
+        "馮",
+        "陸",
+        "孫",
+        "洪",
+        "石",
+        "方",
+        "溫",
+        "邱",
+        "廖",
+        "賴",
+        "龍",
+        "董",
+    )
+
+    # 稱謂 (honorific prefixes)
+    prefixes = (
+        "先生",
+        "小姐",
+        "太太",
+        "女士",
+        "博士",
+        "教授",
+    )
