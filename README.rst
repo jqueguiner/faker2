@@ -1,503 +1,126 @@
-*Faker* is a Python package that generates fake data for you. Whether
-you need to bootstrap your database, create good-looking XML documents,
-fill-in your persistence to stress test it, or anonymize data taken from
-a production service, Faker is for you.
+faker2
+======
 
-Faker is heavily inspired by `PHP Faker`_, `Perl Faker`_, and by `Ruby Faker`_.
+**faker2** is a fork of `joke2k/Faker <https://github.com/joke2k/faker>`_ — the
+reference Python library for generating fake data — extended for one specific job:
+**pseudonymizing personally identifiable information (PII) in speech and text
+datasets, in every language a speech model transcribes.**
+
+It is a **drop-in replacement**: the import name stays ``faker``, so existing code
+keeps working unchanged::
+
+    pip install faker2
+
+    from faker import Faker
+    Faker("ml_IN").name()   # ശ്രീദേവി വാസുദേവൻ
+
+The upstream project's own README is kept, unmodified, as ``README.upstream.rst``.
 
 ----
 
-::
-
-    _|_|_|_|          _|
-    _|        _|_|_|  _|  _|      _|_|    _|  _|_|
-    _|_|_|  _|    _|  _|_|      _|_|_|_|  _|_|
-    _|      _|    _|  _|  _|    _|        _|
-    _|        _|_|_|  _|    _|    _|_|_|  _|
-
-|pypi| |build| |coverage| |license|
-
-----
-
-Compatibility
--------------
-
-Starting from version ``4.0.0``, ``Faker`` dropped support for Python 2 and from version ``5.0.0``
-only supports Python 3.8 and above. If you still need Python 2 compatibility, please install version ``3.0.1`` in the
-meantime, and please consider updating your codebase to support Python 3 so you can enjoy the
-latest features ``Faker`` has to offer. Please see the `extended docs`_ for more details, especially
-if you are upgrading from version ``2.0.4`` and below as there might be breaking changes.
-
-This package was also previously called ``fake-factory`` which was already deprecated by the end
-of 2016, and much has changed since then, so please ensure that your project and its dependencies
-do not depend on the old package.
-
-Basic Usage
------------
-
-Install with pip:
-
-.. code:: bash
-
-    pip install Faker
-
-Use ``faker.Faker()`` to create and initialize a faker
-generator, which can generate data by accessing properties named after
-the type of data you want.
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-
-    fake.name()
-    # 'Lucy Cechtelar'
-
-    fake.address()
-    # '426 Jordy Lodge
-    #  Cartwrightshire, SC 88120-6700'
-
-    fake.text()
-    # 'Sint velit eveniet. Rerum atque repellat voluptatem quia rerum. Numquam excepturi
-    #  beatae sint laudantium consequatur. Magni occaecati itaque sint et sit tempore. Nesciunt
-    #  amet quidem. Iusto deleniti cum autem ad quia aperiam.
-    #  A consectetur quos aliquam. In iste aliquid et aut similique suscipit. Consequatur qui
-    #  quaerat iste minus hic expedita. Consequuntur error magni et laboriosam. Aut aspernatur
-    #  voluptatem sit aliquam. Dolores voluptatum est.
-    #  Aut molestias et maxime. Fugit autem facilis quos vero. Eius quibusdam possimus est.
-    #  Ea quaerat et quisquam. Deleniti sunt quam. Adipisci consequatur id in occaecati.
-    #  Et sint et. Ut ducimus quod nemo ab voluptatum.'
-
-Each call to method ``fake.name()`` yields a different (random) result.
-This is because faker forwards ``faker.Generator.method_name()`` calls
-to ``faker.Generator.format(method_name)``.
-
-.. code:: python
-
-    for _ in range(10):
-      print(fake.name())
-
-    # 'Adaline Reichel'
-    # 'Dr. Santa Prosacco DVM'
-    # 'Noemy Vandervort V'
-    # 'Lexi O'Conner'
-    # 'Gracie Weber'
-    # 'Roscoe Johns'
-    # 'Emmett Lebsack'
-    # 'Keegan Thiel'
-    # 'Wellington Koelpin II'
-    # 'Ms. Karley Kiehn V'
-
-Pytest fixtures
----------------
-
-``Faker`` also has its own ``pytest`` plugin which provides a ``faker`` fixture you can use in your
-tests. Please check out the `pytest fixture docs` to learn more.
-
-Providers
----------
-
-Each of the generator properties (like ``name``, ``address``, and
-``lorem``) are called "fake". A faker generator has many of them,
-packaged in "providers".
-
-.. code:: python
-
-    from faker import Faker
-    from faker.providers import internet
-
-    fake = Faker()
-    fake.add_provider(internet)
-
-    print(fake.ipv4_private())
-
-
-Check the `extended docs`_ for a list of `bundled providers`_ and a list of
-`community providers`_.
-
-Localization
-------------
-
-``faker.Faker`` can take a locale as an argument, to return localized
-data. If no localized provider is found, the factory falls back to the
-default LCID string for US english, ie: ``en_US``.
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker('it_IT')
-    for _ in range(10):
-        print(fake.name())
-
-    # 'Elda Palumbo'
-    # 'Pacifico Giordano'
-    # 'Sig. Avide Guerra'
-    # 'Yago Amato'
-    # 'Eustachio Messina'
-    # 'Dott. Violante Lombardo'
-    # 'Sig. Alighieri Monti'
-    # 'Costanzo Costa'
-    # 'Nazzareno Barbieri'
-    # 'Max Coppola'
-
-``faker.Faker`` also supports multiple locales. New in v3.0.0.
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker(['it_IT', 'en_US', 'ja_JP'])
-    for _ in range(10):
-        print(fake.name())
-
-    # 鈴木 陽一
-    # Leslie Moreno
-    # Emma Williams
-    # 渡辺 裕美子
-    # Marcantonio Galuppi
-    # Martha Davis
-    # Kristen Turner
-    # 中津川 春香
-    # Ashley Castillo
-    # 山田 桃子
-
-You can check available Faker locales in the source code, under the
-providers package. The localization of Faker is an ongoing process, for
-which we need your help. Please don't hesitate to create a localized
-provider for your own locale and submit a Pull Request (PR).
-
-Optimizations
--------------
-The Faker constructor takes a performance-related argument called
-``use_weighting``. It specifies whether to attempt to have the frequency
-of values match real-world frequencies (e.g. the English name Gary would
-be much more frequent than the name Lorimer). If ``use_weighting`` is ``False``,
-then all items have an equal chance of being selected, and the selection
-process is much faster. The default is ``True``.
-
-Command line usage
-------------------
-
-When installed, you can invoke faker from the command-line:
-
-.. code:: console
-
-    faker [-h] [--version] [-o output]
-          [-l {bg_BG,cs_CZ,...,zh_CN,zh_TW}]
-          [-r REPEAT] [-s SEP]
-          [-i package.containing.custom_provider]
-          [fake] [fake argument [fake argument ...]]
-
-Where:
-
--  ``faker``: is the script when installed in your environment, in
-   development you could use ``python -m faker`` instead
-
--  ``-h``, ``--help``: shows a help message
-
--  ``--version``: shows the program's version number
-
--  ``-o FILENAME``: redirects the output to the specified filename
-
--  ``-l {bg_BG,cs_CZ,...,zh_CN,zh_TW}``: allows use of a localized
-   provider
-
--  ``-r REPEAT``: will generate a specified number of outputs
-
--  ``-s SEP``: will generate the specified separator after each
-   generated output
-
--  ``-i package.containing.custom_provider`` additional custom provider to use. Note this
-   is the import path of the package containing your Provider class, not the
-   custom Provider class itself. Can be repeated to add multiple providers.
-
--  ``fake``: is the name of the fake to generate an output for, such as
-   ``name``, ``address``, or ``text``
-
--  ``[fake argument ...]``: optional arguments to pass to the fake (e.g. the
-   profile fake takes an optional list of comma separated field names as the
-   first argument)
-
-Examples:
-
-.. code:: console
-
-    $ faker address
-    968 Bahringer Garden Apt. 722
-    Kristinaland, NJ 09890
-
-    $ faker -l de_DE address
-    Samira-Niemeier-Allee 56
-    94812 Biedenkopf
-
-    $ faker profile ssn,birthdate
-    {'ssn': '628-10-1085', 'birthdate': '2008-03-29'}
-
-    $ faker -r=3 -s=";" name
-    Willam Kertzmann;
-    Josiah Maggio;
-    Gayla Schmitt;
-
-    $ faker -i faker_credit_score credit_score_full
-    Experian/Fair Isaac Risk Model V2SM
-    Experian
-    801
-
-How to create a Provider
-------------------------
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-
-    # first, import a similar Provider or use the default one
-    from faker.providers import BaseProvider
-
-    # create new provider class
-    class MyProvider(BaseProvider):
-        def foo(self) -> str:
-            return 'bar'
-
-    # then add new provider to faker instance
-    fake.add_provider(MyProvider)
-
-    # now you can use:
-    fake.foo()
-    # 'bar'
-
-
-How to create a Dynamic Provider
---------------------------------
-
-Dynamic providers can read elements from an external source.
-
-.. code:: python
-
-    from faker import Faker
-    from faker.providers import DynamicProvider
-
-    medical_professions_provider = DynamicProvider(
-         provider_name="medical_profession",
-         elements=["dr.", "doctor", "nurse", "surgeon", "clerk"],
-    )
-
-    fake = Faker()
-
-    # then add new provider to faker instance
-    fake.add_provider(medical_professions_provider)
-
-    # now you can use:
-    fake.medical_profession()
-    # 'dr.'
-
-How to customize the Lorem Provider
------------------------------------
-
-You can provide your own sets of words if you don't want to use the
-default lorem ipsum one. The following example shows how to do it with a list of words picked from `cakeipsum <http://www.cupcakeipsum.com/>`__ :
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-
-    my_word_list = [
-    'danish','cheesecake','sugar',
-    'Lollipop','wafer','Gummies',
-    'sesame','Jelly','beans',
-    'pie','bar','Ice','oat' ]
-
-    fake.sentence()
-    # 'Expedita at beatae voluptatibus nulla omnis.'
-
-    fake.sentence(ext_word_list=my_word_list)
-    # 'Oat beans oat Lollipop bar cheesecake.'
-
-
-How to use with Factory Boy
----------------------------
-
-`Factory Boy` already ships with integration with ``Faker``. Simply use the
-``factory.Faker`` method of ``factory_boy``:
-
-.. code:: python
-
-    import factory
-    from myapp.models import Book
-
-    class BookFactory(factory.Factory):
-        class Meta:
-            model = Book
-
-        title = factory.Faker('sentence', nb_words=4)
-        author_name = factory.Faker('name')
-
-Accessing the `random` instance
--------------------------------
-
-The ``.random`` property on the generator returns the instance of
-``random.Random`` used to generate the values:
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-    fake.random
-    fake.random.getstate()
-
-By default all generators share the same instance of ``random.Random``, which
-can be accessed with ``from faker.generator import random``. Using this may
-be useful for plugins that want to affect all faker instances.
-
-Unique values
--------------
-
-Through use of the ``.unique`` property on the generator, you can guarantee
-that any generated values are unique for this specific instance.
-
-.. code:: python
-
-   from faker import Faker
-   fake = Faker()
-   names = [fake.unique.first_name() for i in range(500)]
-   assert len(set(names)) == len(names)
-
-On ``Faker`` instances with multiple locales, you can specify the locale to use
-for the unique values by using the subscript notation:
-
-.. code:: python
-
-   from faker import Faker
-   fake = Faker(['en_US', 'fr_FR'])
-   names = [fake.unique["en_US"].first_name() for i in range(500)]
-   assert len(set(names)) == len(names)
-
-Calling ``fake.unique.clear()`` clears the already seen values.
-
-Note, to avoid infinite loops, after a number of attempts to find a unique
-value, Faker will throw a ``UniquenessException``. Beware of the `birthday
-paradox <https://en.wikipedia.org/wiki/Birthday_problem>`_, collisions
-are more likely than you'd think.
-
-
-.. code:: python
-
-   from faker import Faker
-
-   fake = Faker()
-   for i in range(3):
-        # Raises a UniquenessException
-        fake.unique.boolean()
-
-In addition, only hashable arguments and return values can be used
-with ``.unique``.
-
-Seeding the Generator
----------------------
-
-When using Faker for unit testing, you will often want to generate the same
-data set. For convenience, the generator also provides a ``seed()`` method,
-which seeds the shared random number generator. A Seed produces the same result
-when the same methods with the same version of faker are called.
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-    Faker.seed(4321)
-
-    print(fake.name())
-    # 'Margaret Boehm'
-
-Each generator can also be switched to use its own instance of ``random.Random``,
-separated from the shared one, by using the ``seed_instance()`` method, which acts
-the same way. For example:
-
-.. code:: python
-
-    from faker import Faker
-    fake = Faker()
-    fake.seed_instance(4321)
-
-    print(fake.name())
-    # 'Margaret Boehm'
-
-Please note that as we keep updating datasets, results are not guaranteed to be
-consistent across patch versions. If you hardcode results in your test, make sure
-you pinned the version of ``Faker`` down to the patch number.
-
-If you are using ``pytest``, you can seed the ``faker`` fixture by defining a ``faker_seed``
-fixture. Please check out the `pytest fixture docs` to learn more.
-
-Tests
+Why this fork exists
+--------------------
+
+We build multilingual ASR and PII-redaction models at `Gladia <https://gladia.io>`_.
+Training data must be **pseudonymized**: every real person and company name is
+replaced by a plausible surrogate, in the *same language and script* as the source
+text. Upstream Faker is excellent, but it was not designed for that use case, and
+three gaps blocked us:
+
+1. **Missing languages.** Whisper transcribes 100 languages; upstream Faker ships a
+   person provider for only 56 of them. A Malayalam or Amharic transcript had no
+   locale to draw surrogates from, so names either leaked through or were replaced
+   by Latin-script placeholders — both unacceptable.
+
+2. **Name pools too small for dataset scale.** Pseudonymizing a corpus draws tens of
+   thousands of surrogates. ``ja_JP`` ships **51 given names**: 223 Japanese person
+   entities could only yield 50 distinct surrogates, so the same fake name recurred
+   dozens of times. A NER model trained on that data **memorizes the surrogate list**
+   instead of learning the pattern — the dataset teaches the wrong thing.
+
+3. **Company names collapsing.** Several locales had two or three company suffixes
+   and a single format, so a few hundred draws produced barely a hundred distinct
+   companies — the same memorization problem, for organizations.
+
+None of this is a criticism of upstream: generating a handful of fake records for a
+test fixture — Faker's core use case — has entirely different requirements from
+generating a hundred thousand surrogates that a neural network will then train on.
+
+What this fork adds
+-------------------
+
+**48 new locales** — person + company providers with authentic native-script data,
+bringing coverage to **all 100 Whisper languages**:
+
+  ``af_ZA`` ``am_ET`` ``as_IN`` ``ba_RU`` ``be_BY`` ``bo_CN`` ``br_FR`` ``bs_BA``
+  ``cy_GB`` ``eu_ES`` ``fo_FO`` ``gl_ES`` ``haw_US`` ``ht_HT`` ``jw_ID`` ``kk_KZ``
+  ``km_KH`` ``kn_IN`` ``la`` ``lb_LU`` ``ln_CD`` ``lo_LA`` ``mg_MG`` ``mi_NZ``
+  ``ml_IN`` ``mn_MN`` ``ms_MY`` ``mt_MT`` ``my_MM`` ``oc_FR`` ``pa_IN`` ``ps_AF``
+  ``sa_IN`` ``sd_PK`` ``si_LK`` ``sn_ZW`` ``so_SO`` ``sq_AL`` ``sr_RS`` ``su_ID``
+  ``te_IN`` ``tg_TJ`` ``tk_TM`` ``tl_PH`` ``tt_RU`` ``ur_PK`` ``yi_DE`` ``yue_HK``
+
+**Larger given-name pools** where upstream's were too small for dataset-scale
+pseudonymization: ``ja_JP`` 51 → 160, ``ko_KR`` 121 → 186, ``pl_PL`` 153 → 205, plus
+120+ entries per list across the new locales.
+
+**Diversity-hardened company providers**: a sector component was added to eight
+locales whose output space was collapsing, lifting unique-company ratios from 65–79 %
+to 94–97 % over 300 draws.
+
+**Tests that check what matters for this use case** — 288 of them, on top of
+upstream's suite (2 742 passing in total):
+
+- names are emitted in the **expected script** (a Malayalam locale must not produce
+  Latin names);
+- **pool sizes** stay above the memorization threshold;
+- **≥ 85 % unique full names** over 400 seeded draws, **≥ 70 % unique companies**;
+- ``ja_JP`` kana/romaji completeness;
+- every Whisper language resolves to a working locale.
+
+**Merged upstream pull requests** that were open and unreleased — mostly IBAN/bank
+correctness fixes (``uk_UA``, ``ru_RU``, ``no_NO``, ``nl_BE``, ``en_IE``, ``pt_BR``,
+``da_DK``, ``es_ES``, ``en_IN``/``es_MX``/``zh_CN``), the ``en_IN`` company / IFSC /
+license-plate providers, and a ``choices_distribution`` ``IndexError`` fix.
+
+Relationship with upstream
+--------------------------
+
+- **All credit for Faker goes to** `joke2k <https://github.com/joke2k>`_ **and its
+  contributors.** This fork exists to add locales and scale properties — not to
+  replace or compete with the original project. If you do not need the above, use
+  upstream Faker: ``pip install Faker``.
+- The fork tracks upstream ``master``, keeps its **MIT license** and its architecture
+  unchanged; new locales follow the project's exact provider conventions.
+- Locale contributions made here are intended to be **offered back upstream** where
+  they fit the project's scope.
+- ``faker2`` and ``Faker`` both provide the ``faker`` import name and therefore
+  **cannot be installed side by side** in the same environment.
+
+Usage
 -----
 
-Run tests:
+Identical to upstream — see the `Faker documentation <https://faker.readthedocs.io>`_.
+The only difference is the set of available locales::
 
-.. code:: bash
+    from faker import Faker
 
-    $ tox
+    Faker("yue_HK").name()      # 陳嘉敏
+    Faker("sr_RS").name()       # Милена Чолић
+    Faker("am_ET").company()    # company name in Ge'ez script
 
-Write documentation for the providers of the default locale:
+Pseudonymization tip — seed per source item so the mapping is reproducible without
+storing any real→fake table::
 
-.. code:: bash
+    import hashlib
+    from faker import Faker
 
-    $ python -m faker > docs.txt
-
-Write documentation for the providers of a specific locale:
-
-.. code:: bash
-
-    $ python -m faker --lang=de_DE > docs_de.txt
-
-
-Contribute
-----------
-
-Please see `CONTRIBUTING`_.
+    def surrogate(original: str, text: str, locale: str) -> str:
+        seed = int(hashlib.sha1(f"{text}\0{original}".encode()).hexdigest()[:12], 16)
+        fake = Faker(locale)
+        fake.seed_instance(seed)
+        return fake.name()
 
 License
 -------
 
-Faker is released under the MIT License. See the bundled `LICENSE`_ file
-for details.
-
-Credits
--------
-
--  `FZaninotto`_ / `PHP Faker`_
--  `Distribute`_
--  `Buildout`_
--  `modern-package-template`_
-
-
-.. _FZaninotto: https://github.com/fzaninotto
-.. _PHP Faker: https://github.com/fzaninotto/Faker
-.. _Perl Faker: https://metacpan.org/dist/Data-Faker
-.. _Ruby Faker: https://github.com/stympy/faker
-.. _Distribute: https://pypi.org/project/distribute/
-.. _Buildout: https://www.buildout.org/
-.. _modern-package-template: https://pypi.org/project/modern-package-template/
-.. _extended docs: https://faker.readthedocs.io/en/stable/
-.. _bundled providers: https://faker.readthedocs.io/en/stable/providers.html
-.. _community providers: https://faker.readthedocs.io/en/stable/communityproviders.html
-.. _pytest fixture docs: https://faker.readthedocs.io/en/stable/pytest-fixtures.html
-.. _LICENSE: https://github.com/joke2k/faker/blob/master/LICENSE.txt
-.. _CONTRIBUTING: https://github.com/joke2k/faker/blob/master/CONTRIBUTING.rst
-.. _Factory Boy: https://github.com/FactoryBoy/factory_boy
-
-.. |pypi| image:: https://img.shields.io/pypi/v/Faker.svg?style=flat-square&label=version
-    :target: https://pypi.org/project/Faker/
-    :alt: Latest version released on PyPI
-
-.. |coverage| image:: https://img.shields.io/coveralls/joke2k/faker/master.svg?style=flat-square
-    :target: https://coveralls.io/r/joke2k/faker?branch=master
-    :alt: Test coverage
-
-.. |build| image:: https://github.com/joke2k/faker/actions/workflows/ci.yml/badge.svg
-    :target: https://github.com/joke2k/faker/actions/workflows/ci.yml
-    :alt: Build status of the master branch
-
-.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-    :target: https://raw.githubusercontent.com/joke2k/faker/master/LICENSE.txt
-    :alt: Package license
+MIT, unchanged from upstream. See ``LICENSE.txt``.

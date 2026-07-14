@@ -25,10 +25,11 @@ except AttributeError:
     zip_safe = False
 
 setup(
-    name="Faker",
+    name="faker2",
     version=VERSION,
-    description="Faker is a Python package that generates fake data for you.",
+    description="faker2 - fork of Faker with 100-language (Whisper) locale coverage and large name pools for PII pseudonymization.",
     long_description=README,
+    long_description_content_type="text/x-rst",
     entry_points={
         "console_scripts": ["faker=faker.cli:execute_from_command_line"],
         "pytest11": ["faker = faker.contrib.pytest.plugin"],
