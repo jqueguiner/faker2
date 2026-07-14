@@ -9,6 +9,7 @@ so they are tested for three things upstream's generic tests do not check:
 
 import re
 import unicodedata
+
 from collections import Counter
 
 import pytest
