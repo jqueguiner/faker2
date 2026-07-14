@@ -1,13 +1,15 @@
 faker2
 ======
 
+|ci| |coverage| |pypi| |pyversions| |license|
+
 **faker2** is a fork of `joke2k/Faker <https://github.com/joke2k/faker>`_ — the
 reference Python library for generating fake data — extended for one specific job:
 **pseudonymizing personally identifiable information (PII) in speech and text
 datasets, in every language a speech model transcribes.**
 
-It is a **drop-in replacement**: the import name stays ``faker``, so existing code
-keeps working unchanged::
+Install it alongside upstream Faker if you want — the import name is ``faker2``, so
+both can coexist::
 
     pip install faker2
 
@@ -93,8 +95,8 @@ Relationship with upstream
   unchanged; new locales follow the project's exact provider conventions.
 - Locale contributions made here are intended to be **offered back upstream** where
   they fit the project's scope.
-- ``faker2`` and ``Faker`` both provide the ``faker`` import name and therefore
-  **cannot be installed side by side** in the same environment.
+- ``faker2`` uses its own import name (``faker2``), so it **can be installed side by
+  side** with upstream ``Faker`` in the same environment.
 
 Usage
 -----
@@ -102,7 +104,7 @@ Usage
 Identical to upstream — see the `Faker documentation <https://faker.readthedocs.io>`_.
 The only difference is the set of available locales::
 
-    from faker import Faker
+    from faker2 import Faker
 
     Faker("yue_HK").name()      # 陳嘉敏
     Faker("sr_RS").name()       # Милена Чолић
@@ -112,7 +114,7 @@ Pseudonymization tip — seed per source item so the mapping is reproducible wit
 storing any real→fake table::
 
     import hashlib
-    from faker import Faker
+    from faker2 import Faker
 
     def surrogate(original: str, text: str, locale: str) -> str:
         seed = int(hashlib.sha1(f"{text}\0{original}".encode()).hexdigest()[:12], 16)
@@ -124,3 +126,19 @@ License
 -------
 
 MIT, unchanged from upstream. See ``LICENSE.txt``.
+
+.. |ci| image:: https://github.com/jqueguiner/faker2/actions/workflows/ci.yml/badge.svg?branch=master
+   :target: https://github.com/jqueguiner/faker2/actions/workflows/ci.yml
+   :alt: CI
+.. |coverage| image:: https://codecov.io/gh/jqueguiner/faker2/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/jqueguiner/faker2
+   :alt: Coverage
+.. |pypi| image:: https://img.shields.io/pypi/v/faker2.svg
+   :target: https://pypi.org/project/faker2/
+   :alt: PyPI version
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/faker2.svg
+   :target: https://pypi.org/project/faker2/
+   :alt: Supported Python versions
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/jqueguiner/faker2/blob/master/LICENSE.txt
+   :alt: License: MIT
