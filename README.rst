@@ -11,7 +11,7 @@ keeps working unchanged::
 
     pip install faker2
 
-    from faker import Faker
+    from faker2 import Faker
     Faker("ml_IN").name()   # ശ്രീദേവി വാസുദേവൻ
 
 The upstream project's own README is kept, unmodified, as ``README.upstream.rst``.
