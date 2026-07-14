@@ -4,7 +4,22 @@ from .. import Provider as CompanyProvider
 class Provider(CompanyProvider):
     formats = (
         "{{last_name}} {{company_suffix}}",
-        "{{last_name}} {{company_suffix}}",
+        "{{last_name}} {{company_sector}} {{company_suffix}}",
+        "{{last_name}} {{company_sector}}",
+        "{{last_name}} {{last_name}} {{company_suffix}}",
+        "{{last_name}}-{{last_name}} {{company_sector}}",
+    )
+
+    def company_sector(self):
+        return self.random_element(self.company_sectors)
+
+    company_sectors = (
+        'ಟೆಕ್ನಾಲಜೀಸ್',
+        'ಇಂಡಸ್ಟ್ರೀಸ್',
+        'ಎಂಟರ್\u200cಪ್ರೈಸಸ್',
+        'ಸೊಲ್ಯೂಷನ್ಸ್',
+        'ಟ್ರೇಡರ್ಸ್',
+        'ಗ್ರೂಪ್',
     )
 
     # Realistic Karnataka/Indian company suffixes in Kannada script
