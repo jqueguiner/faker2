@@ -1,0 +1,73 @@
+name: Coverage badge
+
+# Fully self-contained coverage badge: no third-party account (codecov/coveralls)
+# and no secret beyond the default GITHUB_TOKEN. The job measures coverage, writes
+# a shields.io "endpoint" JSON, and publishes it to an orphan `badges` branch.
+# README references it via https://img.shields.io/endpoint?url=<raw badges/coverage.json>.
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: coverage-badge
+  cancel-in-progress: true
+
+jobs:
+  badge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Measure coverage
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pytest pytest-mock validators freezegun coverage
+          python -m coverage run -m pytest tests -q
+          python -m coverage json -o /tmp/cov.json
+
+      - name: Write shields endpoint JSON
+        run: |
+          python - <<'PY'
+          import json
+          pct = round(json.load(open("/tmp/cov.json"))["totals"]["percent_covered"])
+          color = ("brightgreen" if pct >= 90 else "green" if pct >= 80 else
+                   "yellowgreen" if pct >= 70 else "yellow" if pct >= 60 else
+                   "orange" if pct >= 50 else "red")
+          json.dump({"schemaVersion": 1, "label": "coverage",
+                     "message": f"{pct}%", "color": color},
+                    open("/tmp/coverage.json", "w"))
+          print("coverage:", pct, "%")
+          PY
+
+      - name: Publish to the badges branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Work in an isolated repo so the main checkout is never touched.
+          d="$(mktemp -d)"; cd "$d"
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin badges; then
+            git checkout -q badges
+          else
+            git checkout -q --orphan badges
+            git rm -rq --cached . 2>/dev/null || true
+          fi
+          cp /tmp/coverage.json coverage.json
+          git add coverage.json
+          if git -c user.name="github-actions[bot]" \
+                 -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                 commit -q -m "coverage: update badge [skip ci]"; then
+            git push -q origin HEAD:badges
+          else
+            echo "coverage unchanged — nothing to publish"
+          fi

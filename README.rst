@@ -130,13 +130,13 @@ MIT, unchanged from upstream. See ``LICENSE.txt``.
 .. |ci| image:: https://github.com/jqueguiner/faker2/actions/workflows/ci.yml/badge.svg?branch=master
    :target: https://github.com/jqueguiner/faker2/actions/workflows/ci.yml
    :alt: CI
-.. |coverage| image:: https://codecov.io/gh/jqueguiner/faker2/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/jqueguiner/faker2
+.. |coverage| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jqueguiner/faker2/badges/coverage.json
+   :target: https://github.com/jqueguiner/faker2/actions/workflows/coverage-badge.yml
    :alt: Coverage
-.. |pypi| image:: https://img.shields.io/pypi/v/faker2.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/faker2.svg?cache=2
    :target: https://pypi.org/project/faker2/
    :alt: PyPI version
-.. |pyversions| image:: https://img.shields.io/pypi/pyversions/faker2.svg
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/faker2.svg?cache=2
    :target: https://pypi.org/project/faker2/
    :alt: Supported Python versions
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
