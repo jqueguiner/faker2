@@ -320,6 +320,8 @@ class Provider(PersonProvider):
             ("Emil", 0.000791656),
             ("Tivadar", 0.000786573),
             ("Henrik", 0.000758063),
+            ("Nimród", 0.05),
+            ("Elek", 0.05),
         )
     )
 
@@ -425,6 +427,13 @@ class Provider(PersonProvider):
             ("Virág", 0.002557156),
             ("Gréta", 0.002515835),
             ("Rebeka", 0.002513351),
+            ("Flóra", 0.05),
+            ("Ivett", 0.05),
+            ("Panna", 0.05),
+            ("Villő", 0.05),
+            ("Cintia", 0.05),
+            ("Franciska", 0.05),
+            ("Gerda", 0.05),
         )
     )
 
