@@ -16,12 +16,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'Технологи',
-        'Үйлдвэр',
-        'Худалдаа',
-        'Групп',
-        'Барилга',
-        'Үйлчилгээ',
+        "Технологи",
+        "Үйлдвэр",
+        "Худалдаа",
+        "Групп",
+        "Барилга",
+        "Үйлчилгээ",
     )
 
     company_suffixes = (

@@ -7,13 +7,9 @@ class Provider(PersonProvider):
     # Cantonese (yue), Hong Kong — Traditional Chinese script (繁體中文)
     # Han naming convention: surname first, then given name, written with no space.
 
-    formats_female = OrderedDict(
-        (("{{last_name}}{{first_name_female}}", 1.0),)  # 漢人 Han
-    )
+    formats_female = OrderedDict((("{{last_name}}{{first_name_female}}", 1.0),))  # 漢人 Han
 
-    formats_male = OrderedDict(
-        (("{{last_name}}{{first_name_male}}", 1.0),)  # 漢人 Han
-    )
+    formats_male = OrderedDict((("{{last_name}}{{first_name_male}}", 1.0),))  # 漢人 Han
 
     formats = formats_male.copy()
     formats.update(formats_female)

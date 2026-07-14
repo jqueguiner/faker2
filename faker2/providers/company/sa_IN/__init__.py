@@ -14,12 +14,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'उद्यमः',
-        'व्यापारः',
-        'निर्माणम्',
-        'सेवाः',
-        'समूहः',
-        'प्रतिष्ठानम्',
+        "उद्यमः",
+        "व्यापारः",
+        "निर्माणम्",
+        "सेवाः",
+        "समूहः",
+        "प्रतिष्ठानम्",
     )
 
     # Realistic company/organisation suffixes rendered with authentic

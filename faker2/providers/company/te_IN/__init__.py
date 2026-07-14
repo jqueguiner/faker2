@@ -14,12 +14,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'టెక్నాలజీస్',
-        'ఇండస్ట్రీస్',
-        'ఎంటర్\u200cప్రైజెస్',
-        'సొల్యూషన్స్',
-        'ట్రేడర్స్',
-        'గ్రూప్',
+        "టెక్నాలజీస్",
+        "ఇండస్ట్రీస్",
+        "ఎంటర్\u200cప్రైజెస్",
+        "సొల్యూషన్స్",
+        "ట్రేడర్స్",
+        "గ్రూప్",
     )
 
     # Realistic Telugu (Andhra Pradesh / Telangana) company suffixes in Telugu script

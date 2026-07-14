@@ -15,12 +15,12 @@ class Provider(CompanyProvider):
 
     # Realistic Cambodian company legal-form designators in Khmer script.
     company_suffixes = (
-        "ខូអិលធីឌី",          # Co., Ltd
-        "អិលធីឌី",            # Ltd
-        "ភីអិលស៊ី",           # PLC
-        "សហគ្រាស",            # Enterprise
-        "ចំកាត់",             # Limited
-        "គ្រុប",              # Group
-        "អ៊ិនធើណេសិនណល",     # International
-        "ថ្រេឌីង",           # Trading
+        "ខូអិលធីឌី",  # Co., Ltd
+        "អិលធីឌី",  # Ltd
+        "ភីអិលស៊ី",  # PLC
+        "សហគ្រាស",  # Enterprise
+        "ចំកាត់",  # Limited
+        "គ្រុប",  # Group
+        "អ៊ិនធើណេសិនណល",  # International
+        "ថ្រេឌីង",  # Trading
     )

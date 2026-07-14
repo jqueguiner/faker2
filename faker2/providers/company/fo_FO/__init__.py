@@ -16,12 +16,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'Tøkni',
-        'Handil',
-        'Bygging',
-        'Íðnaður',
-        'Bólkur',
-        'Tænastur',
+        "Tøkni",
+        "Handil",
+        "Bygging",
+        "Íðnaður",
+        "Bólkur",
+        "Tænastur",
     )
 
     # Faroese legal company forms:

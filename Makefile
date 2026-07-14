@@ -5,7 +5,7 @@ flake8:
 	flake8 --extend-ignore=E203 faker tests
 
 mypy:
-	mypy --install-types --non-interactive --config mypy.ini faker
+	mypy --install-types --non-interactive --config mypy.ini faker2
 
 black:
 	black --line-length 120 .

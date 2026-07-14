@@ -14,12 +14,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'ಟೆಕ್ನಾಲಜೀಸ್',
-        'ಇಂಡಸ್ಟ್ರೀಸ್',
-        'ಎಂಟರ್\u200cಪ್ರೈಸಸ್',
-        'ಸೊಲ್ಯೂಷನ್ಸ್',
-        'ಟ್ರೇಡರ್ಸ್',
-        'ಗ್ರೂಪ್',
+        "ಟೆಕ್ನಾಲಜೀಸ್",
+        "ಇಂಡಸ್ಟ್ರೀಸ್",
+        "ಎಂಟರ್\u200cಪ್ರೈಸಸ್",
+        "ಸೊಲ್ಯೂಷನ್ಸ್",
+        "ಟ್ರೇಡರ್ಸ್",
+        "ಗ್ರೂಪ್",
     )
 
     # Realistic Karnataka/Indian company suffixes in Kannada script

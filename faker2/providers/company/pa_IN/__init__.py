@@ -14,12 +14,12 @@ class Provider(CompanyProvider):
         return self.random_element(self.company_sectors)
 
     company_sectors = (
-        'ਟੈਕਨਾਲੋਜੀਜ਼',
-        'ਇੰਡਸਟਰੀਜ਼',
-        'ਐਂਟਰਪ੍ਰਾਈਜ਼ਿਜ਼',
-        'ਸੋਲਿਊਸ਼ਨਜ਼',
-        'ਟ੍ਰੇਡਰਜ਼',
-        'ਗਰੁੱਪ',
+        "ਟੈਕਨਾਲੋਜੀਜ਼",
+        "ਇੰਡਸਟਰੀਜ਼",
+        "ਐਂਟਰਪ੍ਰਾਈਜ਼ਿਜ਼",
+        "ਸੋਲਿਊਸ਼ਨਜ਼",
+        "ਟ੍ਰੇਡਰਜ਼",
+        "ਗਰੁੱਪ",
     )
 
     # Realistic Punjabi/Indian company suffixes in Gurmukhi script
