@@ -37,6 +37,8 @@ from faker2.naming import realnames, grammar
 realnames.infer_gender("Jacques", "FR")       # "m"
 realnames.first_name_like("Jacques", "FR")    # frequency-weighted male FR name
 realnames.first_name("JP", "f")               # weighted female Japanese name
+realnames.detect_country("Yuki")              # [("JP", 0.58), ("CN", 0.05), ...]
+realnames.detect_country("Bjorn")             # [("SE", 0.29), ("NO", 0.22), ...]
 
 grammar.pluralize("baby")                     # "babies"
 grammar.agree(3, "dog")                       # "3 dogs"
@@ -44,6 +46,10 @@ grammar.agree(3, "dog")                       # "3 dogs"
 
 `realnames` needs `pyarrow` (in `dev-requirements.txt`). The bundled-locale
 variant `faker2.naming.gender` has no extra dependency.
+
+`detect_country` ranks where a name is most **characteristic** (its within-country
+frequency share), not where the most *people* with that name live — raw
+population counts are intentionally not in the dataset.
 
 ## Rust port
 

@@ -41,3 +41,45 @@ def test_grammar_agreement():
     assert agree(1, "dog") == "a dog"
     assert agree(3, "dog") == "3 dogs"
     assert is_are(1) == "is" and is_are(2) == "are"
+
+
+def test_grammar_pluralize_branches():
+    from faker2.naming.grammar import indefinite_article
+    assert pluralize("sheep") == "sheep"          # uncountable
+    assert pluralize("wife") == "wives"           # -fe
+    assert pluralize("wolf") == "wolves"          # -f
+    assert pluralize("bus") == "buses"            # -s
+    assert pluralize("church") == "churches"      # -ch
+    assert pluralize("day") == "days"             # vowel+y (not -ies)
+    assert pluralize("cat") == "cats"             # default
+    assert pluralize("MAN") == "men"              # irregular, case-insensitive
+    assert indefinite_article("hour") == "a"      # vowel heuristic (letter-based)
+    assert indefinite_article("egg") == "an"
+
+
+def test_grammar_singularize_branches():
+    assert singularize("sheep") == "sheep"        # uncountable
+    assert singularize("wives") == "wife"         # -ves -> -fe map
+    assert singularize("wolves") == "wolf"        # -ves -> -f
+    assert singularize("boxes") == "box"          # -es after sibilant
+    assert singularize("dogs") == "dog"           # plain -s
+    assert singularize("class") == "class"        # -ss unchanged
+    assert singularize("fish") == "fish"          # no trailing s
+
+
+def test_gender_unisex_and_alias():
+    from faker2.naming.gender import UNISEX, replace_first_name, _resolver
+    r = _resolver("en_US")
+    both = r._male & r._female
+    if both:                                       # a name in both pools -> unisex
+        name = next(iter(both))
+        assert r.infer(name) == UNISEX
+    # alias delegates to first_name_like
+    Faker.seed(5)
+    assert isinstance(replace_first_name("John", "en_US"), str)
+    # female-only name infers FEMALE; unknown name -> either-pool draw
+    from faker2.naming.gender import FEMALE
+    fem_only = next(iter(r._female - r._male), None)
+    if fem_only:
+        assert r.infer(fem_only) == FEMALE
+    assert isinstance(r.replace("Zzxqwv"), str)   # unknown -> _draw either pool

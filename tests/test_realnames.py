@@ -1,0 +1,81 @@
+"""Tests for the parquet-backed real-name provider (faker2.naming.realnames)."""
+
+import pytest
+
+pytest.importorskip("pyarrow")
+
+from faker2 import Faker
+from faker2.naming import realnames as rn
+
+
+def test_infer_gender_scopes():
+    assert rn.infer_gender("Jacques", "FR") == "m"
+    assert rn.infer_gender("Marie", "FR") == "f"
+    assert rn.infer_gender("jacques", "fr") == "m"        # case-insensitive + lc code
+    assert rn.infer_gender("Zzxqwv", "FR") is None        # unknown
+    assert rn.infer_gender("Patrick") in ("m", "f", "u")  # global scope (no country)
+
+
+def test_first_name_weighted():
+    Faker.seed(1)
+    assert isinstance(rn.first_name("JP", "f"), str)
+    assert isinstance(rn.first_name("BR", "m"), str)
+    assert rn.first_name(None, "m")                        # global pool
+    assert rn.first_name("ZZ", "m")                        # unknown country -> global fallback
+
+
+def test_first_name_like_preserves_gender():
+    Faker.seed(42)
+    for src in ("Jacques", "Julien", "Pierre"):
+        for _ in range(40):
+            repl = rn.first_name_like(src, "FR")
+            assert rn.infer_gender(repl, "FR") in ("m", "u")
+    assert rn.infer_gender(rn.first_name_like("Marie", "FR"), "FR") in ("f", "u")
+
+
+def test_first_name_like_unknown_input():
+    Faker.seed(7)
+    # unknown name -> random gender, still returns a plausible name
+    out = rn.first_name_like("Zzxqwv", "FR")
+    assert isinstance(out, str) and out
+
+
+def test_available_countries():
+    ccs = rn.available_countries()
+    assert len(ccs) >= 130
+    assert "FR" in ccs and "US" in ccs
+    assert ccs == sorted(ccs)
+
+
+def test_unisex_detection_if_present():
+    # find a name used by both genders in one country from the bank, expect "u"
+    bank = rn._bank()
+    found = None
+    for (key, cc), counts in bank._gender_by.items():
+        if cc and counts.get("m", 0) > 0 and counts.get("f", 0) > 0:
+            minority = min(counts["m"], counts["f"])
+            if minority >= 0.20 * (counts["m"] + counts["f"]):
+                found = (key, cc)
+                break
+    if found:
+        key, cc = found
+        assert rn.infer_gender(key, cc) == "u"
+
+
+def test_detect_country():
+    yuki = rn.detect_country("Yuki", top=3)
+    assert yuki and yuki[0][0] == "JP"                 # top guess Japan
+    assert all(0.0 <= s <= 1.0 for _cc, s in yuki)     # normalized scores
+    assert abs(sum(s for _cc, s in rn.detect_country("Yuki", top=999)) - 1.0) < 1e-6
+    bjorn = [cc for cc, _ in rn.detect_country("Bjorn", top=4)]
+    assert "SE" in bjorn or "NO" in bjorn              # Nordic
+    assert rn.detect_country("Zzxqwv") == []           # unknown -> empty
+    assert len(rn.detect_country("Maria", top=2)) <= 2 # top-N respected
+
+
+def test_seed_reproducible():
+    Faker.seed(99)
+    a = [rn.first_name_like("Jacques", "FR") for _ in range(5)]
+    Faker.seed(99)
+    b = [rn.first_name_like("Jacques", "FR") for _ in range(5)]
+    assert a == b

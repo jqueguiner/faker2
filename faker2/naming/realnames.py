@@ -51,6 +51,8 @@ class _NameBank:
         pools: Dict[Tuple[Optional[str], str], Tuple[List[str], List[float]]] = {}
         # name_key -> {gender: summed relative weight}, at country + global scope
         gender_by: Dict[Tuple[str, Optional[str]], Dict[str, float]] = {}
+        # name_key -> {country: summed within-country share} for origin detection
+        country_by: Dict[str, Dict[str, float]] = {}
 
         acc: Dict[Tuple[Optional[str], str], List] = {}
         for name, asc, cc, g, fr in zip(names, asciis, ccs, genders, freqs):
@@ -67,6 +69,9 @@ class _NameBank:
                 for scope in (cc, None):
                     d = gender_by.setdefault((akey, scope), {})
                     d[g] = d.get(g, 0) + w
+                if cc:
+                    c = country_by.setdefault(akey, {})
+                    c[cc] = c.get(cc, 0.0) + w
 
         # finalize cumulative weights for O(log n) weighted draw
         for key, (nm, wt) in acc.items():
@@ -78,6 +83,7 @@ class _NameBank:
 
         self._pools = pools
         self._gender_by = gender_by
+        self._country_by = country_by
 
     def infer(self, name: str, country: Optional[str] = None) -> Optional[str]:
         key = name.strip().lower()
@@ -113,6 +119,20 @@ class _NameBank:
     def countries(self) -> List[str]:
         return sorted({cc for (cc, _g) in self._pools if cc})
 
+    def detect_country(self, name: str, top: int = 5) -> List[Tuple[str, float]]:
+        """Rank the countries where ``name`` is most characteristic.
+
+        Scores are that name's within-country share, normalized across the
+        countries it appears in (so they sum to 1). Returns ``[(cc, score)]``
+        highest first, ``[]`` if the name is unknown.
+        """
+        counts = self._country_by.get(name.strip().lower())
+        if not counts:
+            return []
+        total = sum(counts.values()) or 1.0
+        ranked = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)
+        return [(cc, w / total) for cc, w in ranked[:top]]
+
 
 @lru_cache(maxsize=1)
 def _bank() -> _NameBank:
@@ -125,6 +145,17 @@ def infer_gender(name: str, country: Optional[str] = None) -> Optional[str]:
     ``country`` is an ISO-3166 alpha-2 code (e.g. ``"FR"``); omit for global.
     """
     return _bank().infer(name, country.upper() if country else None)
+
+
+def detect_country(name: str, top: int = 5) -> List[Tuple[str, float]]:
+    """Guess the country/countries a first name most likely comes from.
+
+        detect_country("Giovanni")  # [("IT", 0.34), ("AR", 0.12), ...]
+
+    Returns ``[(country_code, score)]`` ranked high-to-low (scores sum to 1),
+    or ``[]`` for an unknown name.
+    """
+    return _bank().detect_country(name, top)
 
 
 def first_name(country: Optional[str] = None, gender: str = MALE) -> Optional[str]:
