@@ -42,10 +42,7 @@ def _check_group(
     for parent, children in graph.items():
         for child in children:
             if idx[parent] >= idx[child]:
-                errors.append(
-                    f"{path}:{child}: subclass must appear after base `{parent}` in this file "
-                    f"({label})."
-                )
+                errors.append(f"{path}:{child}: subclass must appear after base `{parent}` in this file " f"({label}).")
 
     if graph:
         return errors
@@ -82,19 +79,12 @@ def check_file(path: Path) -> list[str]:
 
     if underscore_names and test_names:
         u_max = max(
-            i
-            for i, node in enumerate(tree.body)
-            if isinstance(node, ast.ClassDef) and node.name in underscore_names
+            i for i, node in enumerate(tree.body) if isinstance(node, ast.ClassDef) and node.name in underscore_names
         )
-        t_min = min(
-            i
-            for i, node in enumerate(tree.body)
-            if isinstance(node, ast.ClassDef) and node.name in test_names
-        )
+        t_min = min(i for i, node in enumerate(tree.body) if isinstance(node, ast.ClassDef) and node.name in test_names)
         if u_max > t_min:
             errors.append(
-                f"{path}: top-level classes named with leading `_` must appear "
-                f"before any top-level `Test*` class."
+                f"{path}: top-level classes named with leading `_` must appear " f"before any top-level `Test*` class."
             )
 
     u_set = set(underscore_names)

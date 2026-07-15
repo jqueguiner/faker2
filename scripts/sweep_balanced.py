@@ -98,11 +98,7 @@ def score_country(table, probes, work):
                             if c["P"]:
                                 fn += 1
                             continue
-                        score = (
-                            w_ipa * c["ipa_sim"]
-                            + w_spell * c["spell_sim"]
-                            + META_BONUS * c["meta"]
-                        )
+                        score = w_ipa * c["ipa_sim"] + w_spell * c["spell_sim"] + META_BONUS * c["meta"]
                         sel = score >= mn
                         if sel and c["P"]:
                             tp += 1
@@ -166,9 +162,7 @@ def main():
     }
     payload = {
         "_default": default,
-        "countries": {
-            c: {k: r[k] for k in ("w_ipa", "min", "cap")} for c, r in result.items()
-        },
+        "countries": {c: {k: r[k] for k in ("w_ipa", "min", "cap")} for c, r in result.items()},
     }
     with open(args.out, "w") as f:
         json.dump(payload, f, indent=2, sort_keys=True)

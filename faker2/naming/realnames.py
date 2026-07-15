@@ -142,9 +142,7 @@ class _NameBank:
         ipa_key: Dict[Tuple[str, str], str] = {}
 
         acc: Dict[Tuple[Optional[str], str], List] = {}
-        for name, asc, cc, g, fr, cs, phon, ipa in zip(
-            names, asciis, ccs, genders, freqs, shares, phonetics, ipas
-        ):
+        for name, asc, cc, g, fr, cs, phon, ipa in zip(names, asciis, ccs, genders, freqs, shares, phonetics, ipas):
             if not g or g == " ":
                 continue
             w = float(fr) if fr else 1e-6
@@ -201,9 +199,7 @@ class _NameBank:
 
     def infer(self, name: str, country: Optional[str] = None) -> Optional[str]:
         key = name.strip().lower()
-        counts = self._gender_by.get((key, country)) or (
-            self._gender_by.get((key, None)) if country else None
-        )
+        counts = self._gender_by.get((key, country)) or (self._gender_by.get((key, None)) if country else None)
         if not counts:
             return None
         m, f = counts.get(MALE, 0), counts.get(FEMALE, 0)
@@ -214,9 +210,7 @@ class _NameBank:
             return MALE if m > f else FEMALE
         return MALE if m else FEMALE
 
-    def draw(
-        self, country: Optional[str], gender: str, avoid: Optional[str] = None
-    ) -> Optional[str]:
+    def draw(self, country: Optional[str], gender: str, avoid: Optional[str] = None) -> Optional[str]:
         pool = self._pools.get((country, gender)) or self._pools.get((None, gender))
         if not pool:
             return None
@@ -272,9 +266,7 @@ class _NameBank:
         ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
         return [(n, w / total) for n, w in ranked[:top]]
 
-    def _balanced(
-        self, key: str, country: str, max_distance: Optional[int]
-    ) -> List[Tuple[str, float]]:
+    def _balanced(self, key: str, country: str, max_distance: Optional[int]) -> List[Tuple[str, float]]:
         """Consensus of IPA + metaphone + spelling, weighted by frequency.
 
         A candidate scores high only when several signals agree, so
@@ -319,9 +311,7 @@ class _NameBank:
                 out.append((nm, share * sim))
         return out
 
-    def _fuzzy(
-        self, key: str, country: str, method: str, max_distance: Optional[int]
-    ) -> List[Tuple[str, float]]:
+    def _fuzzy(self, key: str, country: str, method: str, max_distance: Optional[int]) -> List[Tuple[str, float]]:
         table = self._by_country.get(country)
         if not table:
             return []

@@ -13,6 +13,11 @@ path = "src/lib.rs"
 name = "faker2"
 path = "src/bin/faker2.rs"
 
+# The benchmark example uses the data-backed API, so it needs the feature.
+[[example]]
+name = "bench"
+required-features = ["real-names"]
+
 [dependencies]
 arrow = { version = "59.1.0", default-features = false, optional = true }
 parquet = { version = "59.1.0", default-features = false, features = ["arrow", "zstd"], optional = true }

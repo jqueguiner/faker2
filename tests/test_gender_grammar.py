@@ -101,9 +101,5 @@ def test_full_name_gendered():
     from faker2.naming import realnames as rn
 
     Faker.seed(4)
-    pure = sum(
-        1
-        for _ in range(40)
-        if rn.infer_gender(full_name("fr_FR", "f").split()[0], "FR") in ("f", "u", None)
-    )
+    pure = sum(1 for _ in range(40) if rn.infer_gender(full_name("fr_FR", "f").split()[0], "FR") in ("f", "u", None))
     assert pure >= 32
