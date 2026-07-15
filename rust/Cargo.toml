@@ -34,3 +34,7 @@ locales = ["dep:serde_json"]
 [[example]]
 name = "benchfull"
 required-features = ["locales"]
+
+[[example]]
+name = "benchall"
+required-features = ["locales"]
