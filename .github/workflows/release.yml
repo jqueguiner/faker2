@@ -30,8 +30,10 @@ jobs:
     outputs:
       ver: ${{ steps.v.outputs.ver }}
     steps:
+      # Base 40.29.0 (next minor) so the Rust build supersedes the legacy
+      # pure-Python 40.28.1.postN and never collides. Monotonic per run.
       - id: v
-        run: echo "ver=40.28.1.post${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+        run: echo "ver=40.29.0.post${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
   wheels:
     needs: version
