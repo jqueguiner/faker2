@@ -9,6 +9,7 @@ isort>=5.13.2
 mypy-extensions>=1.0.0
 mypy>=1.15.0,<2
 packaging>=25.0
+pyarrow>=15.0  # faker2.realnames — reads data/first_names.parquet ground truth
 pytest>=6.0.1
 setuptools>=80.9.0
 tox>=4.24.1
