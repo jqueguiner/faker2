@@ -1,5 +1,10 @@
+include README.md
 include README.rst
 include README.upstream.rst
+include data/*.parquet
+include data/README.md
+recursive-include rust *.rs *.toml *.md
+recursive-exclude rust/target *
 include LICENSE.txt
 include CONTRIBUTING.rst
 include CHANGELOG.md
