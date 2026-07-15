@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jqueguiner/faker2/badges/coverage.json)](https://github.com/jqueguiner/faker2/actions/workflows/coverage-badge.yml)
+[![codecov](https://codecov.io/gh/jqueguiner/faker2/branch/master/graph/badge.svg)](https://codecov.io/gh/jqueguiner/faker2)
 [![PyPI](https://img.shields.io/pypi/v/faker2.svg?cache=2)](https://pypi.org/project/faker2/)
 [![Python versions](https://img.shields.io/pypi/pyversions/faker2.svg?cache=2)](https://pypi.org/project/faker2/)
 [![Rust release](https://github.com/jqueguiner/faker2/actions/workflows/rust-release.yml/badge.svg)](https://github.com/jqueguiner/faker2/releases)

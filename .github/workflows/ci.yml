@@ -239,11 +239,10 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           flags: ubuntu-${{ matrix.python }}
           fail_ci_if_error: false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_SERVICE_NAME: github
  
   test_windows:
     runs-on: windows-latest
