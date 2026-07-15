@@ -15,7 +15,11 @@ Format: Parquet, zstd-compressed, dictionary-encoded low-cardinality columns.
 
 ## Schema (`first_names`)
 
-`name, name_ascii, country_code, country_name, continent, gender, unisex, country_rank, frequency`
+`name, name_ascii, country_code, country_name, continent, gender, unisex, country_rank, frequency, country_share, phonetic`
+
+- `frequency` — relative share within `(country_code, gender)` (weighted sampling).
+- `country_share` — relative share within `country_code` (cross-gender comparable; powers `detect_country` / `homophones` probabilities).
+- `phonetic` — double-metaphone key (powers `homophones`).
 
 `frequency` is a **relative share** (0..1) within each `(country_code, gender)`
 group — it preserves the weighting used for sampling but deliberately carries

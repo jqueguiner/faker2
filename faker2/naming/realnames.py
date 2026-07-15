@@ -38,13 +38,19 @@ class _NameBank:
         import pyarrow.parquet as pq  # local import: optional dependency
 
         tbl = pq.read_table(
-            path, columns=["name", "name_ascii", "country_code", "gender", "frequency"]
+            path,
+            columns=[
+                "name", "name_ascii", "country_code", "gender",
+                "frequency", "country_share", "phonetic",
+            ],
         )
         names = tbl.column("name").to_pylist()
         asciis = tbl.column("name_ascii").to_pylist()
         ccs = tbl.column("country_code").to_pylist()
         genders = tbl.column("gender").to_pylist()
         freqs = tbl.column("frequency").to_pylist()
+        shares = tbl.column("country_share").to_pylist()
+        phonetics = tbl.column("phonetic").to_pylist()
 
         # (country, gender) -> (names[], cumulative_weights[]).
         # Weights are *relative* frequencies (shares), never raw counts.
@@ -53,12 +59,21 @@ class _NameBank:
         gender_by: Dict[Tuple[str, Optional[str]], Dict[str, float]] = {}
         # name_key -> {country: summed within-country share} for origin detection
         country_by: Dict[str, Dict[str, float]] = {}
+        # (name_key, country) -> phonetic key; (country, phonetic) -> {name: share}
+        phon_key: Dict[Tuple[str, str], str] = {}
+        homo: Dict[Tuple[str, str], Dict[str, float]] = {}
 
         acc: Dict[Tuple[Optional[str], str], List] = {}
-        for name, asc, cc, g, fr in zip(names, asciis, ccs, genders, freqs):
+        for name, asc, cc, g, fr, cs, phon in zip(
+            names, asciis, ccs, genders, freqs, shares, phonetics
+        ):
             if not g or g == " ":
                 continue
             w = float(fr) if fr else 1e-6
+            csh = float(cs) if cs else 1e-9
+            if cc and phon:
+                homo.setdefault((cc, phon), {})
+                homo[(cc, phon)][name] = homo[(cc, phon)].get(name, 0.0) + csh
             for scope in (cc, None):  # per-country and global pools
                 key = (scope, g)
                 lst = acc.setdefault(key, [[], []])
@@ -72,6 +87,8 @@ class _NameBank:
                 if cc:
                     c = country_by.setdefault(akey, {})
                     c[cc] = c.get(cc, 0.0) + w
+                    if phon:
+                        phon_key[(akey, cc)] = phon
 
         # finalize cumulative weights for O(log n) weighted draw
         for key, (nm, wt) in acc.items():
@@ -84,6 +101,8 @@ class _NameBank:
         self._pools = pools
         self._gender_by = gender_by
         self._country_by = country_by
+        self._phon_key = phon_key
+        self._homo = homo
 
     def infer(self, name: str, country: Optional[str] = None) -> Optional[str]:
         key = name.strip().lower()
@@ -118,6 +137,29 @@ class _NameBank:
 
     def countries(self) -> List[str]:
         return sorted({cc for (cc, _g) in self._pools if cc})
+
+    def homophones(
+        self, name: str, country: str, top: int = 10, include_self: bool = True
+    ) -> List[Tuple[str, float]]:
+        """Names that sound like ``name`` in ``country``, with probabilities.
+
+        Groups names by phonetic key (double-metaphone) within the country and
+        weights each by its country-wide frequency share. Returns
+        ``[(name, probability)]`` (probabilities over the group sum to 1),
+        highest first.
+        """
+        phon = self._phon_key.get((name.strip().lower(), country))
+        if not phon:
+            return []
+        group = self._homo.get((country, phon))
+        if not group:
+            return []
+        items = list(group.items())
+        if not include_self:
+            items = [(n, w) for n, w in items if n.lower() != name.strip().lower()]
+        total = sum(w for _n, w in items) or 1.0
+        ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
+        return [(n, w / total) for n, w in ranked[:top]]
 
     def detect_country(self, name: str, top: int = 5) -> List[Tuple[str, float]]:
         """Rank the countries where ``name`` is most characteristic.
@@ -156,6 +198,20 @@ def detect_country(name: str, top: int = 5) -> List[Tuple[str, float]]:
     or ``[]`` for an unknown name.
     """
     return _bank().detect_country(name, top)
+
+
+def homophones(
+    name: str, country: str, top: int = 10, include_self: bool = True
+) -> List[Tuple[str, float]]:
+    """Same-sounding names in a country, with probabilities.
+
+        homophones("Dominique", "FR")
+        # [("Dominique", 0.91), ("Dominic", 0.03), ("Dominik", 0.02), ...]
+
+    Groups by double-metaphone within ``country`` and weights by country-wide
+    frequency share. Probabilities sum to 1. ``[]`` if the name is unknown.
+    """
+    return _bank().homophones(name, country.upper() if country else "", top, include_self)
 
 
 def first_name(country: Optional[str] = None, gender: str = MALE) -> Optional[str]:

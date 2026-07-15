@@ -73,6 +73,22 @@ def test_detect_country():
     assert len(rn.detect_country("Maria", top=2)) <= 2 # top-N respected
 
 
+def test_homophones():
+    h = rn.homophones("Dominique", "FR", top=6)
+    names = [n for n, _p in h]
+    assert h[0][0] == "Dominique"                       # most frequent variant first
+    assert "Dominic" in names and "Dominik" in names    # same-sounding variants
+    assert abs(sum(p for _n, p in rn.homophones("Dominique", "FR", top=999)) - 1.0) < 1e-6
+    # symmetric: Dominic sees the same group
+    assert "Dominique" in [n for n, _ in rn.homophones("Dominic", "FR")]
+    # exclude_self drops the query name
+    assert "Dominique" not in [
+        n for n, _ in rn.homophones("Dominique", "FR", include_self=False)
+    ]
+    assert rn.homophones("Zzxqwv", "FR") == []          # unknown -> empty
+    assert len(rn.homophones("Marc", "FR", top=3)) <= 3 # top-N respected
+
+
 def test_seed_reproducible():
     Faker.seed(99)
     a = [rn.first_name_like("Jacques", "FR") for _ in range(5)]
