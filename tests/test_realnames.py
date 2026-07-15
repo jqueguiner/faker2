@@ -89,6 +89,38 @@ def test_homophones():
     assert len(rn.homophones("Marc", "FR", top=3)) <= 3 # top-N respected
 
 
+def test_homophones_methods():
+    import pytest as _pytest
+
+    # each method returns a normalized distribution containing the query
+    for method in ("metaphone", "ipa", "levenshtein"):
+        h = rn.homophones("Dominique", "FR", method=method, top=999)
+        assert h and h[0][0] == "Dominique"
+        assert abs(sum(p for _n, p in h) - 1.0) < 1e-6
+
+    # IPA is more precise than metaphone: Xavier collides in metaphone, not IPA
+    meta = [n for n, _ in rn.homophones("Sophie", "FR", method="metaphone", top=10)]
+    ipa = [n for n, _ in rn.homophones("Sophie", "FR", method="ipa", top=10)]
+    assert "Xavier" in meta and "Xavier" not in ipa
+
+    # levenshtein respects max_distance (all within edit distance 1 of "marc")
+    from faker2.naming.realnames import _levenshtein
+    lev = rn.homophones("Marc", "FR", method="levenshtein", max_distance=1)
+    assert all(_levenshtein("marc", n.lower(), 1) <= 1 for n, _ in lev)
+
+    assert rn.homophones("Zzxqwv", "FR", method="ipa") == []
+    with _pytest.raises(ValueError):
+        rn.homophones("Marc", "FR", method="nonsense")
+
+
+def test_levenshtein_helper():
+    from faker2.naming.realnames import _levenshtein
+    assert _levenshtein("marc", "mark", 5) == 1
+    assert _levenshtein("kitten", "sitting", 5) == 3
+    assert _levenshtein("abc", "abc", 5) == 0
+    assert _levenshtein("abc", "xyzuvw", 2) == 3   # capped early -> cap+1
+
+
 def test_seed_reproducible():
     Faker.seed(99)
     a = [rn.first_name_like("Jacques", "FR") for _ in range(5)]

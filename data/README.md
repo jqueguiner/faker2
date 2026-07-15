@@ -19,7 +19,8 @@ Format: Parquet, zstd-compressed, dictionary-encoded low-cardinality columns.
 
 - `frequency` — relative share within `(country_code, gender)` (weighted sampling).
 - `country_share` — relative share within `country_code` (cross-gender comparable; powers `detect_country` / `homophones` probabilities).
-- `phonetic` — double-metaphone key (powers `homophones`).
+- `phonetic` — double-metaphone key (`homophones` method="metaphone").
+- `ipa` — IPA transcription (`homophones` method="ipa").
 
 `frequency` is a **relative share** (0..1) within each `(country_code, gender)`
 group — it preserves the weighting used for sampling but deliberately carries

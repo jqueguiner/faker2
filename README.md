@@ -52,9 +52,18 @@ variant `faker2.naming.gender` has no extra dependency.
 frequency share), not where the most *people* with that name live — raw
 population counts are intentionally not in the dataset.
 
-`homophones` groups same-sounding names in a country by double-metaphone and
-weights them by frequency share (probabilities sum to 1). Double-metaphone is
-coarse, so results may include near-homophones.
+`homophones` returns same-sounding names in a country with probabilities
+(weighted by frequency share, summing to 1). Pick the matching `method`:
+
+- `"metaphone"` (default) — double-metaphone group; fast but coarse (may pull in
+  near-homophones, e.g. Sophie↔Xavier).
+- `"ipa"` — IPA transcription within `max_distance` edits; precise (drops Xavier).
+- `"levenshtein"` — spelling within `max_distance` edits; orthographic variants.
+
+```python
+realnames.homophones("Dominique", "FR", method="ipa")          # Dominique .97, Dominik .02 …
+realnames.homophones("Marc", "FR", method="levenshtein", max_distance=1)
+```
 
 ## Rust port
 

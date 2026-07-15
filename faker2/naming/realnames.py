@@ -30,6 +30,36 @@ _DATA = os.path.join(
 
 MALE, FEMALE, UNISEX = "m", "f", "u"
 
+# homophone matching methods
+METAPHONE, IPA, LEVENSHTEIN = "metaphone", "ipa", "levenshtein"
+_DEFAULT_DIST = {IPA: 1, LEVENSHTEIN: 2}
+
+# IPA diacritics to drop before comparing phonemes (stress, length, spaces)
+_IPA_STRIP = str.maketrans("", "", "ˈˌːˑ ./")
+
+
+def _norm_ipa(s: str) -> str:
+    return s.translate(_IPA_STRIP)
+
+
+def _levenshtein(a: str, b: str, cap: int) -> int:
+    """Edit distance, short-circuiting once it provably exceeds ``cap``."""
+    if abs(len(a) - len(b)) > cap:
+        return cap + 1
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        best = i
+        for j, cb in enumerate(b, 1):
+            cost = 0 if ca == cb else 1
+            v = min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost)
+            cur.append(v)
+            best = min(best, v)
+        if best > cap:
+            return cap + 1
+        prev = cur
+    return prev[-1]
+
 
 class _NameBank:
     """In-memory indexes built once from the parquet."""
@@ -41,7 +71,7 @@ class _NameBank:
             path,
             columns=[
                 "name", "name_ascii", "country_code", "gender",
-                "frequency", "country_share", "phonetic",
+                "frequency", "country_share", "phonetic", "ipa",
             ],
         )
         names = tbl.column("name").to_pylist()
@@ -51,6 +81,7 @@ class _NameBank:
         freqs = tbl.column("frequency").to_pylist()
         shares = tbl.column("country_share").to_pylist()
         phonetics = tbl.column("phonetic").to_pylist()
+        ipas = tbl.column("ipa").to_pylist()
 
         # (country, gender) -> (names[], cumulative_weights[]).
         # Weights are *relative* frequencies (shares), never raw counts.
@@ -62,10 +93,14 @@ class _NameBank:
         # (name_key, country) -> phonetic key; (country, phonetic) -> {name: share}
         phon_key: Dict[Tuple[str, str], str] = {}
         homo: Dict[Tuple[str, str], Dict[str, float]] = {}
+        # per-country name table for ipa / levenshtein scans, deduped by name:
+        #   cc -> {name: [ascii_lower, ipa_norm, share]}
+        by_country: Dict[str, Dict[str, list]] = {}
+        ipa_key: Dict[Tuple[str, str], str] = {}
 
         acc: Dict[Tuple[Optional[str], str], List] = {}
-        for name, asc, cc, g, fr, cs, phon in zip(
-            names, asciis, ccs, genders, freqs, shares, phonetics
+        for name, asc, cc, g, fr, cs, phon, ipa in zip(
+            names, asciis, ccs, genders, freqs, shares, phonetics, ipas
         ):
             if not g or g == " ":
                 continue
@@ -74,6 +109,13 @@ class _NameBank:
             if cc and phon:
                 homo.setdefault((cc, phon), {})
                 homo[(cc, phon)][name] = homo[(cc, phon)].get(name, 0.0) + csh
+            if cc:
+                ipa_n = _norm_ipa(ipa) if ipa else ""
+                row = by_country.setdefault(cc, {}).get(name)
+                if row is None:
+                    by_country[cc][name] = [(asc or name).lower(), ipa_n, csh]
+                else:
+                    row[2] += csh  # accumulate share across genders
             for scope in (cc, None):  # per-country and global pools
                 key = (scope, g)
                 lst = acc.setdefault(key, [[], []])
@@ -89,6 +131,8 @@ class _NameBank:
                     c[cc] = c.get(cc, 0.0) + w
                     if phon:
                         phon_key[(akey, cc)] = phon
+                    if ipa_n:
+                        ipa_key[(akey, cc)] = ipa_n
 
         # finalize cumulative weights for O(log n) weighted draw
         for key, (nm, wt) in acc.items():
@@ -103,6 +147,8 @@ class _NameBank:
         self._country_by = country_by
         self._phon_key = phon_key
         self._homo = homo
+        self._by_country = by_country
+        self._ipa_key = ipa_key
 
     def infer(self, name: str, country: Optional[str] = None) -> Optional[str]:
         key = name.strip().lower()
@@ -139,27 +185,63 @@ class _NameBank:
         return sorted({cc for (cc, _g) in self._pools if cc})
 
     def homophones(
-        self, name: str, country: str, top: int = 10, include_self: bool = True
+        self,
+        name: str,
+        country: str,
+        method: str = METAPHONE,
+        top: int = 10,
+        include_self: bool = True,
+        max_distance: Optional[int] = None,
     ) -> List[Tuple[str, float]]:
         """Names that sound like ``name`` in ``country``, with probabilities.
 
-        Groups names by phonetic key (double-metaphone) within the country and
-        weights each by its country-wide frequency share. Returns
-        ``[(name, probability)]`` (probabilities over the group sum to 1),
-        highest first.
+        ``method`` selects how candidates are matched:
+
+        * ``"metaphone"`` — exact double-metaphone group (fast, coarse).
+        * ``"ipa"`` — IPA transcription within ``max_distance`` edits (precise).
+        * ``"levenshtein"`` — spelling within ``max_distance`` edits (orthographic).
+
+        Each candidate is weighted by its country-wide frequency share; the
+        returned probabilities sum to 1, highest first. ``[]`` if unknown.
         """
-        phon = self._phon_key.get((name.strip().lower(), country))
-        if not phon:
+        key = name.strip().lower()
+        if method == METAPHONE:
+            phon = self._phon_key.get((key, country))
+            group = self._homo.get((country, phon)) if phon else None
+            items = list(group.items()) if group else []
+        else:
+            items = self._fuzzy(key, country, method, max_distance)
+        if not items:
             return []
-        group = self._homo.get((country, phon))
-        if not group:
-            return []
-        items = list(group.items())
         if not include_self:
-            items = [(n, w) for n, w in items if n.lower() != name.strip().lower()]
+            items = [(n, w) for n, w in items if n.lower() != key]
         total = sum(w for _n, w in items) or 1.0
         ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
         return [(n, w / total) for n, w in ranked[:top]]
+
+    def _fuzzy(self, key: str, country: str, method: str, max_distance):
+        table = self._by_country.get(country)
+        if not table:
+            return []
+        cap = max_distance if max_distance is not None else _DEFAULT_DIST.get(method, 2)
+        if method == IPA:
+            query = self._ipa_key.get((key, country))
+            field = 1
+        elif method == LEVENSHTEIN:
+            query = key
+            field = 0
+        else:
+            raise ValueError(f"unknown method {method!r}")
+        if not query:
+            return []
+        out = []
+        for nm, row in table.items():
+            target = row[field]
+            if not target:
+                continue
+            if _levenshtein(query, target, cap) <= cap:
+                out.append((nm, row[2]))
+        return out
 
     def detect_country(self, name: str, top: int = 5) -> List[Tuple[str, float]]:
         """Rank the countries where ``name`` is most characteristic.
@@ -201,17 +283,26 @@ def detect_country(name: str, top: int = 5) -> List[Tuple[str, float]]:
 
 
 def homophones(
-    name: str, country: str, top: int = 10, include_self: bool = True
+    name: str,
+    country: str,
+    method: str = METAPHONE,
+    top: int = 10,
+    include_self: bool = True,
+    max_distance: Optional[int] = None,
 ) -> List[Tuple[str, float]]:
     """Same-sounding names in a country, with probabilities.
 
-        homophones("Dominique", "FR")
-        # [("Dominique", 0.91), ("Dominic", 0.03), ("Dominik", 0.02), ...]
+        homophones("Dominique", "FR")                    # metaphone (default)
+        homophones("Dominique", "FR", method="ipa")      # precise, IPA edit-distance
+        homophones("Dominique", "FR", method="levenshtein")  # spelling edit-distance
 
-    Groups by double-metaphone within ``country`` and weights by country-wide
-    frequency share. Probabilities sum to 1. ``[]`` if the name is unknown.
+    ``method`` is ``"metaphone"`` | ``"ipa"`` | ``"levenshtein"``. Candidates are
+    weighted by country-wide frequency share; probabilities sum to 1. ``[]`` if
+    the name is unknown.
     """
-    return _bank().homophones(name, country.upper() if country else "", top, include_self)
+    return _bank().homophones(
+        name, country.upper() if country else "", method, top, include_self, max_distance
+    )
 
 
 def first_name(country: Optional[str] = None, gender: str = MALE) -> Optional[str]:
