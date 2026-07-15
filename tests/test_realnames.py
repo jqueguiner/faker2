@@ -93,15 +93,17 @@ def test_homophones_methods():
     import pytest as _pytest
 
     # each method returns a normalized distribution containing the query
-    for method in ("metaphone", "ipa", "levenshtein"):
+    for method in ("metaphone", "ipa", "levenshtein", "balanced"):
         h = rn.homophones("Dominique", "FR", method=method, top=999)
         assert h and h[0][0] == "Dominique"
         assert abs(sum(p for _n, p in h) - 1.0) < 1e-6
 
-    # IPA is more precise than metaphone: Xavier collides in metaphone, not IPA
-    meta = [n for n, _ in rn.homophones("Sophie", "FR", method="metaphone", top=10)]
-    ipa = [n for n, _ in rn.homophones("Sophie", "FR", method="ipa", top=10)]
-    assert "Xavier" in meta and "Xavier" not in ipa
+    # IPA and balanced are more precise than metaphone: Xavier collides in
+    # metaphone (coarse) but not in IPA or balanced.
+    meta = [n for n, _ in rn.homophones("Sophie", "FR", method="metaphone", top=20)]
+    ipa = [n for n, _ in rn.homophones("Sophie", "FR", method="ipa", top=20)]
+    bal = [n for n, _ in rn.homophones("Sophie", "FR", method="balanced", top=20)]
+    assert "Xavier" in meta and "Xavier" not in ipa and "Xavier" not in bal
 
     # levenshtein respects max_distance (all within edit distance 1 of "marc")
     from faker2.naming.realnames import _levenshtein

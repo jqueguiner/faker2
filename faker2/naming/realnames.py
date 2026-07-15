@@ -31,8 +31,11 @@ _DATA = os.path.join(
 MALE, FEMALE, UNISEX = "m", "f", "u"
 
 # homophone matching methods
-METAPHONE, IPA, LEVENSHTEIN = "metaphone", "ipa", "levenshtein"
-_DEFAULT_DIST = {IPA: 1, LEVENSHTEIN: 2}
+METAPHONE, IPA, LEVENSHTEIN, BALANCED = "metaphone", "ipa", "levenshtein", "balanced"
+_DEFAULT_DIST = {IPA: 1, LEVENSHTEIN: 2, BALANCED: 1}
+# balanced blend: IPA + spelling drive the score, metaphone is a small bonus.
+# Metaphone alone must NOT pass the threshold (else coarse collisions survive).
+_BAL_W_IPA, _BAL_W_SPELL, _BAL_META_BONUS, _BAL_MIN = 0.6, 0.4, 0.05, 0.5
 
 # IPA diacritics to drop before comparing phonemes (stress, length, spaces)
 _IPA_STRIP = str.maketrans("", "", "ˈˌːˑ ./")
@@ -40,6 +43,14 @@ _IPA_STRIP = str.maketrans("", "", "ˈˌːˑ ./")
 
 def _norm_ipa(s: str) -> str:
     return s.translate(_IPA_STRIP)
+
+
+def _sim(a: str, b: str) -> float:
+    """Normalized similarity in [0,1] from edit distance; 0 if either empty."""
+    if not a or not b:
+        return 0.0
+    m = max(len(a), len(b))
+    return 1.0 - _levenshtein(a, b, m) / m
 
 
 def _levenshtein(a: str, b: str, cap: int) -> int:
@@ -113,7 +124,8 @@ class _NameBank:
                 ipa_n = _norm_ipa(ipa) if ipa else ""
                 row = by_country.setdefault(cc, {}).get(name)
                 if row is None:
-                    by_country[cc][name] = [(asc or name).lower(), ipa_n, csh]
+                    # [ascii_lower, ipa_norm, share, metaphone]
+                    by_country[cc][name] = [(asc or name).lower(), ipa_n, csh, phon or ""]
                 else:
                     row[2] += csh  # accumulate share across genders
             for scope in (cc, None):  # per-country and global pools
@@ -209,6 +221,8 @@ class _NameBank:
             phon = self._phon_key.get((key, country))
             group = self._homo.get((country, phon)) if phon else None
             items = list(group.items()) if group else []
+        elif method == BALANCED:
+            items = self._balanced(key, country, max_distance)
         else:
             items = self._fuzzy(key, country, method, max_distance)
         if not items:
@@ -218,6 +232,49 @@ class _NameBank:
         total = sum(w for _n, w in items) or 1.0
         ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
         return [(n, w / total) for n, w in ranked[:top]]
+
+    def _balanced(self, key: str, country: str, max_distance):
+        """Consensus of IPA + metaphone + spelling, weighted by frequency.
+
+        A candidate scores high only when several signals agree, so
+        method-specific false positives (e.g. a metaphone-only collision that
+        is IPA-far) fall below threshold and drop out.
+        """
+        table = self._by_country.get(country)
+        if not table:
+            return []
+        q_ipa = self._ipa_key.get((key, country), "")
+        q_phon = self._phon_key.get((key, country), "")
+        cap = max_distance if max_distance is not None else _DEFAULT_DIST[BALANCED]
+
+        # candidate pool: metaphone group ∪ IPA-close names (bounds the scan)
+        pool = set()
+        if q_phon:
+            grp = self._homo.get((country, q_phon))
+            if grp:
+                pool.update(grp)
+        if q_ipa:
+            for nm, row in table.items():
+                if row[1] and _levenshtein(q_ipa, row[1], cap) <= cap:
+                    pool.add(nm)
+
+        out = []
+        for nm in pool:
+            row = table.get(nm)
+            if not row:
+                continue
+            ascii_n, ipa_n, share, phon = row
+            ipa_sim = _sim(q_ipa, ipa_n)
+            spell_sim = _sim(key, ascii_n)
+            meta = 1.0 if q_phon and phon == q_phon else 0.0
+            if q_ipa and ipa_n:
+                base = _BAL_W_IPA * ipa_sim + _BAL_W_SPELL * spell_sim
+            else:  # no IPA to compare -> lean on spelling (+ metaphone signal)
+                base = 0.5 * spell_sim + 0.5 * meta
+            sim = min(1.0, base + _BAL_META_BONUS * meta)
+            if sim >= _BAL_MIN or nm.lower() == key:
+                out.append((nm, share * sim))
+        return out
 
     def _fuzzy(self, key: str, country: str, method: str, max_distance):
         table = self._by_country.get(country)
@@ -295,10 +352,12 @@ def homophones(
         homophones("Dominique", "FR")                    # metaphone (default)
         homophones("Dominique", "FR", method="ipa")      # precise, IPA edit-distance
         homophones("Dominique", "FR", method="levenshtein")  # spelling edit-distance
+        homophones("Dominique", "FR", method="balanced") # consensus of all three
 
-    ``method`` is ``"metaphone"`` | ``"ipa"`` | ``"levenshtein"``. Candidates are
-    weighted by country-wide frequency share; probabilities sum to 1. ``[]`` if
-    the name is unknown.
+    ``method`` is ``"metaphone"`` | ``"ipa"`` | ``"levenshtein"`` | ``"balanced"``.
+    ``"balanced"`` blends IPA + metaphone + spelling similarity so only names that
+    agree across signals survive. Candidates are weighted by country-wide
+    frequency share; probabilities sum to 1. ``[]`` if the name is unknown.
     """
     return _bank().homophones(
         name, country.upper() if country else "", method, top, include_self, max_distance
