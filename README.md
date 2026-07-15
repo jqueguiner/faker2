@@ -73,6 +73,21 @@ indicative only.
 
 \* Not identical logic — Rust port vs upstream faker `first_name`.
 
+### Resource usage
+
+Whole-process footprint of the real-names benchmark (load the 1.43M-name bank,
+then 3M ops), measured with `/usr/bin/time -v`:
+
+| Metric | Python | Rust (release) | Ratio |
+|---|---:|---:|---:|
+| Peak RAM (RSS) | ~1.27 GB | ~0.43 GB | ~3.0× less |
+| CPU time (user+sys) | 45.5 s | 3.0 s | ~15× less |
+| Wall clock | 38.3 s | 3.0 s | ~13× less |
+
+RAM is dominated by the in-memory name index (per-country + global pools).
+Both hold the full 1.43M-row dataset resident; Rust's compact `HashMap` +
+`String` storage uses ~3× less than the Python `dict` structures + interpreter.
+
 Reproduce:
 
 ```bash

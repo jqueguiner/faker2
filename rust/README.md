@@ -97,7 +97,9 @@ f.first_name_real(Some("JP"), Gender::Female);        // weighted female JP name
 | `first_name_like_real` | 3.79 M ops/s | 0.84 M ops/s |
 | bank load (1.43M rows) | 2.3 s | 8.9 s |
 
-~4–5× faster on identical logic. See top-level `README.md` for the full table.
+~4–5× faster on identical logic. Whole-process footprint (load bank + 3M ops):
+peak RAM ~0.43 GB vs Python ~1.27 GB (~3× less), CPU time 3.0s vs 45.5s
+(~15× less). See top-level `README.md` for the full tables.
 
 ## Grammatical number agreement
 
