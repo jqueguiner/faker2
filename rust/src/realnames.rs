@@ -44,7 +44,10 @@ fn bal_params() -> &'static (HashMap<String, BalCfg>, BalCfg) {
     static P: OnceLock<(HashMap<String, BalCfg>, BalCfg)> = OnceLock::new();
     P.get_or_init(|| {
         let path = std::env::var("FAKER2_BALANCED_PARAMS").unwrap_or_else(|_| {
-            format!("{}/../data/balanced_params.json", env!("CARGO_MANIFEST_DIR"))
+            format!(
+                "{}/../data/balanced_params.json",
+                env!("CARGO_MANIFEST_DIR")
+            )
         });
         let parse = |v: &serde_json::Value| BalCfg {
             w_ipa: v
