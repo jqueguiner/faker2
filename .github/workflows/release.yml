@@ -1,0 +1,162 @@
+name: Release on merge
+
+# On every merge to master (touching the Rust/native/data sources) this rebuilds
+# the Rust engine, ships cross-platform wheels + sdist + CLI binaries as a GitHub
+# Release, and publishes the wheels to PyPI (trusted publishing).
+#
+# Version is auto-computed as 40.28.1.post<run_number> (monotonic, PEP 440).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "rust/**"
+      - "native/**"
+      - "data/**"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      ver: ${{ steps.v.outputs.ver }}
+    steps:
+      - id: v
+        run: echo "ver=40.28.1.post${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+  wheels:
+    needs: version
+    name: wheel ${{ matrix.platform }} ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux, runner: ubuntu-latest, target: x86_64, manylinux: auto }
+          - { platform: linux, runner: ubuntu-latest, target: aarch64, manylinux: auto }
+          - { platform: macos, runner: macos-latest, target: aarch64, manylinux: "" }
+          - { platform: macos, runner: macos-latest, target: x86_64, manylinux: "" }
+          - { platform: windows, runner: windows-latest, target: x64, manylinux: "" }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage dataset + set version
+        shell: bash
+        run: |
+          mkdir -p native/python/faker2/data
+          cp data/first_names.parquet data/balanced_params.json data/locales.json data/recipes.json native/python/faker2/data/
+          v="${{ needs.version.outputs.ver }}"
+          python - "$v" <<'PY'
+          import re, sys
+          v = sys.argv[1]
+          for p, pat in [("native/pyproject.toml", r'(?m)^version = ".*"'),
+                         ("native/python/faker2/__init__.py", r'(?m)^__version__ = ".*"')]:
+              s = open(p).read()
+              key = 'version = ' if 'pyproject' in p else '__version__ = '
+              s = re.sub(pat, f'{key}"{v}"', s)
+              open(p, "w").write(s)
+          PY
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -m native/Cargo.toml
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.platform }}-${{ matrix.target }}
+          path: dist/*.whl
+
+  sdist:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage dataset + set version
+        run: |
+          mkdir -p native/python/faker2/data
+          cp data/first_names.parquet data/balanced_params.json data/locales.json data/recipes.json native/python/faker2/data/
+          sed -i "s/^version = .*/version = \"${{ needs.version.outputs.ver }}\"/" native/pyproject.toml
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist -m native/Cargo.toml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  binaries:
+    needs: version
+    name: cli ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-musl }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build CLI
+        working-directory: rust
+        shell: bash
+        run: |
+          rustup target add ${{ matrix.target }} || true
+          cargo build --release --bin faker2 --target ${{ matrix.target }}
+      - name: Archive
+        shell: bash
+        run: |
+          mkdir -p out
+          bin=rust/target/${{ matrix.target }}/release/faker2
+          [ -f "$bin.exe" ] && bin="$bin.exe"
+          cp "$bin" "out/faker2-${{ matrix.target }}$([[ "$bin" == *.exe ]] && echo .exe)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}
+          path: out/*
+
+  release:
+    needs: [version, wheels, sdist, binaries]
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - name: Download wheels + sdist
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "{wheels-*,sdist}"
+          merge-multiple: true
+          path: pydist
+      - name: Download CLI binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cli-*
+          merge-multiple: true
+          path: bin
+      - name: Create Release + attach everything
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.version.outputs.ver }}
+          name: v${{ needs.version.outputs.ver }}
+          files: |
+            pydist/*
+            bin/*
+      - name: Publish to PyPI (wheels + sdist only)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        continue-on-error: true
+        with:
+          packages-dir: pydist
+          skip-existing: true

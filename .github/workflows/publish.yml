@@ -1,16 +1,13 @@
 name: Publish faker2 to PyPI
 
 on:
-  release:
-    types: [published]
+  # Pure-Python publishing is retired: faker2 is now published as the
+  # Rust wheels by release.yml. Kept for manual use only.
   workflow_dispatch:
     inputs:
       target:
         description: "Where to publish"
-        required: true
-        default: testpypi
-        type: choice
-        options: [testpypi, pypi]
+        required: false
 
 jobs:
   build:
