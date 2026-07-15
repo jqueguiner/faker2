@@ -35,7 +35,30 @@ METAPHONE, IPA, LEVENSHTEIN, BALANCED = "metaphone", "ipa", "levenshtein", "bala
 _DEFAULT_DIST = {IPA: 1, LEVENSHTEIN: 2, BALANCED: 1}
 # balanced blend: IPA + spelling drive the score, metaphone is a small bonus.
 # Metaphone alone must NOT pass the threshold (else coarse collisions survive).
-_BAL_W_IPA, _BAL_W_SPELL, _BAL_META_BONUS, _BAL_MIN = 0.6, 0.4, 0.05, 0.5
+# Per-country (w_ipa, min, cap) come from scripts/sweep_balanced.py; the values
+# below are the swept global default (used when a country is untuned).
+_BAL_META_BONUS = 0.05
+_BAL_DEFAULT = {"w_ipa": 0.3, "min": 0.55, "cap": 2}
+_PARAMS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "data",
+    "balanced_params.json",
+)
+
+
+@lru_cache(maxsize=1)
+def _balanced_params() -> dict:
+    try:
+        import json
+        with open(_PARAMS_PATH) as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"_default": _BAL_DEFAULT, "countries": {}}
+
+
+def _bal_cfg(country: str) -> dict:
+    p = _balanced_params()
+    return p["countries"].get(country) or p.get("_default") or _BAL_DEFAULT
 
 # IPA diacritics to drop before comparing phonemes (stress, length, spaces)
 _IPA_STRIP = str.maketrans("", "", "ˈˌːˑ ./")
@@ -245,7 +268,9 @@ class _NameBank:
             return []
         q_ipa = self._ipa_key.get((key, country), "")
         q_phon = self._phon_key.get((key, country), "")
-        cap = max_distance if max_distance is not None else _DEFAULT_DIST[BALANCED]
+        cfg = _bal_cfg(country)
+        w_ipa, w_spell, bal_min = cfg["w_ipa"], 1.0 - cfg["w_ipa"], cfg["min"]
+        cap = max_distance if max_distance is not None else cfg["cap"]
 
         # candidate pool: metaphone group ∪ IPA-close names (bounds the scan)
         pool = set()
@@ -268,11 +293,11 @@ class _NameBank:
             spell_sim = _sim(key, ascii_n)
             meta = 1.0 if q_phon and phon == q_phon else 0.0
             if q_ipa and ipa_n:
-                base = _BAL_W_IPA * ipa_sim + _BAL_W_SPELL * spell_sim
+                base = w_ipa * ipa_sim + w_spell * spell_sim
             else:  # no IPA to compare -> lean on spelling (+ metaphone signal)
                 base = 0.5 * spell_sim + 0.5 * meta
             sim = min(1.0, base + _BAL_META_BONUS * meta)
-            if sim >= _BAL_MIN or nm.lower() == key:
+            if sim >= bal_min or nm.lower() == key:
                 out.append((nm, share * sim))
         return out
 

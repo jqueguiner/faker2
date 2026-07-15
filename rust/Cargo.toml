@@ -16,9 +16,10 @@ path = "src/bin/faker2.rs"
 [dependencies]
 arrow = { version = "59.1.0", default-features = false, optional = true }
 parquet = { version = "59.1.0", default-features = false, features = ["arrow", "zstd"], optional = true }
+serde_json = { version = "1", optional = true }
 
 [features]
 # Core crate is zero-dependency (own PRNG + std only).
 # `real-names` opts into the parquet-backed 139-country ground-truth dataset.
 default = []
-real-names = ["dep:parquet", "dep:arrow"]
+real-names = ["dep:parquet", "dep:arrow", "dep:serde_json"]

@@ -24,10 +24,49 @@ pub const IPA: &str = "ipa";
 pub const LEVENSHTEIN: &str = "levenshtein";
 pub const BALANCED: &str = "balanced";
 
-const BAL_W_IPA: f64 = 0.6;
-const BAL_W_SPELL: f64 = 0.4;
 const BAL_META_BONUS: f64 = 0.05;
-const BAL_MIN: f64 = 0.5;
+
+/// Per-country balanced config (from data/balanced_params.json, swept offline).
+#[derive(Clone, Copy)]
+struct BalCfg {
+    w_ipa: f64,
+    min: f64,
+    cap: usize,
+}
+
+const BAL_DEFAULT: BalCfg = BalCfg { w_ipa: 0.3, min: 0.55, cap: 2 };
+
+fn bal_params() -> &'static (HashMap<String, BalCfg>, BalCfg) {
+    static P: OnceLock<(HashMap<String, BalCfg>, BalCfg)> = OnceLock::new();
+    P.get_or_init(|| {
+        let path = format!("{}/../data/balanced_params.json", env!("CARGO_MANIFEST_DIR"));
+        let parse = |v: &serde_json::Value| BalCfg {
+            w_ipa: v.get("w_ipa").and_then(|x| x.as_f64()).unwrap_or(BAL_DEFAULT.w_ipa),
+            min: v.get("min").and_then(|x| x.as_f64()).unwrap_or(BAL_DEFAULT.min),
+            cap: v.get("cap").and_then(|x| x.as_u64()).unwrap_or(2) as usize,
+        };
+        let mut map = HashMap::new();
+        let mut default = BAL_DEFAULT;
+        if let Ok(txt) = std::fs::read_to_string(&path) {
+            if let Ok(j) = serde_json::from_str::<serde_json::Value>(&txt) {
+                if let Some(d) = j.get("_default") {
+                    default = parse(d);
+                }
+                if let Some(c) = j.get("countries").and_then(|c| c.as_object()) {
+                    for (cc, v) in c {
+                        map.insert(cc.clone(), parse(v));
+                    }
+                }
+            }
+        }
+        (map, default)
+    })
+}
+
+fn bal_cfg(country: &str) -> BalCfg {
+    let (map, default) = bal_params();
+    *map.get(country).unwrap_or(default)
+}
 
 fn default_dist(method: &str) -> usize {
     match method {
@@ -389,7 +428,9 @@ impl NameBank {
             .cloned()
             .unwrap_or_default();
         let q_ascii: Vec<char> = key.chars().collect();
-        let cap = max_distance.unwrap_or_else(|| default_dist(BALANCED));
+        let cfg = bal_cfg(country);
+        let (w_ipa, w_spell, bal_min) = (cfg.w_ipa, 1.0 - cfg.w_ipa, cfg.min);
+        let cap = max_distance.unwrap_or(cfg.cap);
 
         // candidate pool: metaphone group ∪ IPA-close names
         let mut pool: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -416,12 +457,12 @@ impl NameBank {
             let spell_sim = sim(&q_ascii, &row.ascii);
             let meta = if !q_phon.is_empty() && row.phon == q_phon { 1.0 } else { 0.0 };
             let base = if !q_ipa.is_empty() && !row.ipa.is_empty() {
-                BAL_W_IPA * ipa_sim + BAL_W_SPELL * spell_sim
+                w_ipa * ipa_sim + w_spell * spell_sim
             } else {
                 0.5 * spell_sim + 0.5 * meta
             };
             let score = (base + BAL_META_BONUS * meta).min(1.0);
-            if score >= BAL_MIN || nm.to_lowercase() == key {
+            if score >= bal_min || nm.to_lowercase() == key {
                 out.push((nm, row.share * score));
             }
         }

@@ -59,11 +59,20 @@ population counts are intentionally not in the dataset.
   near-homophones, e.g. Sophie↔Xavier).
 - `"ipa"` — IPA transcription within `max_distance` edits; precise (drops Xavier).
 - `"levenshtein"` — spelling within `max_distance` edits; orthographic variants.
+- `"balanced"` — IPA + spelling consensus with **per-country weights** swept
+  offline (`scripts/sweep_balanced.py` → `data/balanced_params.json`, 119
+  countries). Drops metaphone-only collisions (Sophie↛Xavier).
 
 ```python
 realnames.homophones("Dominique", "FR", method="ipa")          # Dominique .97, Dominik .02 …
 realnames.homophones("Marc", "FR", method="levenshtein", max_distance=1)
+realnames.homophones("Sophie", "FR", method="balanced")        # per-country tuned; no Xavier
 ```
+
+The balanced weights were tuned by sweeping thousands of names per country
+against a spelling+metaphone consensus objective (IPA kept independent, since
+the dataset's IPA is a single English G2P). Regenerate with
+`PYTHONPATH=. python3 scripts/sweep_balanced.py`.
 
 ## Rust port
 
