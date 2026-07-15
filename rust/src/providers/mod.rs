@@ -9,3 +9,6 @@ mod internet;
 mod lorem;
 mod misc;
 mod person;
+
+#[cfg(feature = "locales")]
+pub mod algo;

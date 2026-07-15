@@ -27,6 +27,9 @@ mod rng;
 #[cfg(feature = "real-names")]
 mod realnames;
 
+#[cfg(feature = "locales")]
+mod locale;
+
 pub use faker::Faker;
 pub use gender::{Gender, Locale};
 pub use rng::Rng;

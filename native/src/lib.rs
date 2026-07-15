@@ -60,6 +60,18 @@ fn available_countries() -> Vec<String> {
     RsFaker::available_countries()
 }
 
+/// All locales with data (151).
+#[pyfunction]
+fn locales() -> Vec<String> {
+    RsFaker::locales()
+}
+
+/// Data-driven formatter names usable via `Faker.gen(locale, name)`.
+#[pyfunction]
+fn locale_formatters() -> Vec<String> {
+    RsFaker::locale_formatters()
+}
+
 // ---- seedable generator ----------------------------------------------------
 
 #[pyclass(unsendable)]
@@ -121,6 +133,13 @@ impl Faker {
         self.inner.first_name_like_real(name, country)
     }
 
+    /// Generate a data-driven formatter for any of the 151 locales, e.g.
+    /// `f.gen("ja_JP", "name")`, `f.gen("fr_FR", "address")`. Returns None for
+    /// unknown or not-yet-ported (algorithmic) formatters.
+    fn gen(&self, locale: &str, formatter: &str) -> Option<String> {
+        self.inner.gen(locale, formatter)
+    }
+
     /// Gender-pure full name for a locale ("en_US" / "fr_FR").
     #[pyo3(signature = (locale="en_US", gender=None))]
     fn name_of(&self, locale: &str, gender: Option<&str>) -> String {
@@ -139,6 +158,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(detect_country, m)?)?;
     m.add_function(wrap_pyfunction!(homophones, m)?)?;
     m.add_function(wrap_pyfunction!(available_countries, m)?)?;
+    m.add_function(wrap_pyfunction!(locales, m)?)?;
+    m.add_function(wrap_pyfunction!(locale_formatters, m)?)?;
     m.add_class::<Faker>()?;
     m.add("__doc__", "Rust-backed faker2 engine (PyO3).")?;
     Ok(())
