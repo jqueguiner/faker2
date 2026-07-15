@@ -1,7 +1,17 @@
-[paths]
-source = faker/
-
 [run]
 omit =
-    faker/sphinx/autodoc.py
-    faker/sphinx/documentor.py
+    faker2/sphinx/*
+    faker2/__main__.py
+    faker2/cli.py
+
+[report]
+omit =
+    faker2/sphinx/*
+    faker2/__main__.py
+    faker2/cli.py
+fail_under = 95
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
