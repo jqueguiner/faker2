@@ -1,7 +1,7 @@
 //! Lorem provider — mirrors `faker2.providers.lorem` (en_US word list).
 
-use crate::faker::Faker;
 use super::data::LOREM_WORDS;
+use crate::faker::Faker;
 
 impl Faker {
     pub fn word(&self) -> &'static str {
@@ -16,8 +16,8 @@ impl Faker {
         let lo = ((nb_words as f64) * 0.6).round().max(1.0) as usize;
         let hi = ((nb_words as f64) * 1.4).round().max(lo as f64) as usize;
         let n = self.rng.random_int(lo as i64, hi as i64, 1) as usize;
-        let mut words = self.words(n.max(1));
-        let joined = words.drain(..).collect::<Vec<_>>().join(" ");
+        let words = self.words(n.max(1));
+        let joined = words.join(" ");
         let mut s: Vec<char> = joined.chars().collect();
         if let Some(first) = s.first_mut() {
             *first = first.to_ascii_uppercase();

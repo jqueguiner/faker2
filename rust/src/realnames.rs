@@ -34,15 +34,28 @@ struct BalCfg {
     cap: usize,
 }
 
-const BAL_DEFAULT: BalCfg = BalCfg { w_ipa: 0.3, min: 0.55, cap: 2 };
+const BAL_DEFAULT: BalCfg = BalCfg {
+    w_ipa: 0.3,
+    min: 0.55,
+    cap: 2,
+};
 
 fn bal_params() -> &'static (HashMap<String, BalCfg>, BalCfg) {
     static P: OnceLock<(HashMap<String, BalCfg>, BalCfg)> = OnceLock::new();
     P.get_or_init(|| {
-        let path = format!("{}/../data/balanced_params.json", env!("CARGO_MANIFEST_DIR"));
+        let path = format!(
+            "{}/../data/balanced_params.json",
+            env!("CARGO_MANIFEST_DIR")
+        );
         let parse = |v: &serde_json::Value| BalCfg {
-            w_ipa: v.get("w_ipa").and_then(|x| x.as_f64()).unwrap_or(BAL_DEFAULT.w_ipa),
-            min: v.get("min").and_then(|x| x.as_f64()).unwrap_or(BAL_DEFAULT.min),
+            w_ipa: v
+                .get("w_ipa")
+                .and_then(|x| x.as_f64())
+                .unwrap_or(BAL_DEFAULT.w_ipa),
+            min: v
+                .get("min")
+                .and_then(|x| x.as_f64())
+                .unwrap_or(BAL_DEFAULT.min),
             cap: v.get("cap").and_then(|x| x.as_u64()).unwrap_or(2) as usize,
         };
         let mut map = HashMap::new();
@@ -118,7 +131,13 @@ fn sim(a: &[char], b: &[char]) -> f64 {
 fn col_strings(col: &dyn Array) -> Vec<Option<String>> {
     if let Some(a) = col.as_any().downcast_ref::<StringArray>() {
         return (0..a.len())
-            .map(|i| if a.is_null(i) { None } else { Some(a.value(i).to_string()) })
+            .map(|i| {
+                if a.is_null(i) {
+                    None
+                } else {
+                    Some(a.value(i).to_string())
+                }
+            })
             .collect();
     }
     if let Some(d) = col.as_any().downcast_ref::<DictionaryArray<Int32Type>>() {
@@ -177,8 +196,7 @@ impl NameBank {
         let path = std::env::var("FAKER2_NAMES_PARQUET").unwrap_or_else(|_| {
             format!("{}/../data/first_names.parquet", env!("CARGO_MANIFEST_DIR"))
         });
-        let file = std::fs::File::open(&path)
-            .unwrap_or_else(|e| panic!("cannot open {path}: {e}"));
+        let file = std::fs::File::open(&path).unwrap_or_else(|e| panic!("cannot open {path}: {e}"));
         let reader = ParquetRecordBatchReaderBuilder::try_new(file)
             .expect("parquet open")
             .build()
@@ -214,8 +232,14 @@ impl NameBank {
                     Some(n) => n.clone(),
                     None => continue,
                 };
-                let w = freqs[i].filter(|v| *v > 0.0).map(|v| v as f64).unwrap_or(1e-6);
-                let csh = shares[i].filter(|v| *v > 0.0).map(|v| v as f64).unwrap_or(1e-9);
+                let w = freqs[i]
+                    .filter(|v| *v > 0.0)
+                    .map(|v| v as f64)
+                    .unwrap_or(1e-6);
+                let csh = shares[i]
+                    .filter(|v| *v > 0.0)
+                    .map(|v| v as f64)
+                    .unwrap_or(1e-9);
                 let cc = ccs[i].clone();
                 let phon = phonetics[i].clone().unwrap_or_default();
                 let ipa_n = ipas[i].as_deref().map(norm_ipa).unwrap_or_default();
@@ -270,8 +294,11 @@ impl NameBank {
                         }
                     }
                     if let Some(ref c) = cc {
-                        *country_by.entry(key.clone()).or_default().entry(c.clone()).or_insert(0.0) +=
-                            w;
+                        *country_by
+                            .entry(key.clone())
+                            .or_default()
+                            .entry(c.clone())
+                            .or_insert(0.0) += w;
                         if !phon.is_empty() {
                             phon_key.insert((key.clone(), c.clone()), phon.clone());
                         }
@@ -319,7 +346,13 @@ impl NameBank {
         }
     }
 
-    fn draw(&self, rng: &crate::rng::Rng, country: Option<&str>, g: char, avoid: Option<&str>) -> Option<String> {
+    fn draw(
+        &self,
+        rng: &crate::rng::Rng,
+        country: Option<&str>,
+        g: char,
+        avoid: Option<&str>,
+    ) -> Option<String> {
         let pool = country
             .and_then(|c| self.pools.get(&(Some(c.to_string()), g)))
             .or_else(|| self.pools.get(&(None, g)))?;
@@ -385,7 +418,13 @@ impl NameBank {
         items
     }
 
-    fn fuzzy(&self, key: &str, country: &str, method: &str, max_distance: Option<usize>) -> Vec<(String, f64)> {
+    fn fuzzy(
+        &self,
+        key: &str,
+        country: &str,
+        method: &str,
+        max_distance: Option<usize>,
+    ) -> Vec<(String, f64)> {
         let table = match self.by_country.get(country) {
             Some(t) => t,
             None => return vec![],
@@ -412,7 +451,12 @@ impl NameBank {
         out
     }
 
-    fn balanced(&self, key: &str, country: &str, max_distance: Option<usize>) -> Vec<(String, f64)> {
+    fn balanced(
+        &self,
+        key: &str,
+        country: &str,
+        max_distance: Option<usize>,
+    ) -> Vec<(String, f64)> {
         let table = match self.by_country.get(country) {
             Some(t) => t,
             None => return vec![],
@@ -455,7 +499,11 @@ impl NameBank {
             };
             let ipa_sim = sim(&q_ipa, &row.ipa);
             let spell_sim = sim(&q_ascii, &row.ascii);
-            let meta = if !q_phon.is_empty() && row.phon == q_phon { 1.0 } else { 0.0 };
+            let meta = if !q_phon.is_empty() && row.phon == q_phon {
+                1.0
+            } else {
+                0.0
+            };
             let base = if !q_ipa.is_empty() && !row.ipa.is_empty() {
                 w_ipa * ipa_sim + w_spell * spell_sim
             } else {

@@ -1,7 +1,7 @@
 //! Internet provider — mirrors `faker2.providers.internet`.
 
-use crate::faker::Faker;
 use super::data::*;
+use crate::faker::Faker;
 
 impl Faker {
     fn slugify(s: &str) -> String {
@@ -46,7 +46,11 @@ impl Faker {
         format!("{}@{}", self.user_name(), self.free_email_domain())
     }
     pub fn url(&self) -> String {
-        let scheme = if self.rng.below(2) == 0 { "http" } else { "https" };
+        let scheme = if self.rng.below(2) == 0 {
+            "http"
+        } else {
+            "https"
+        };
         format!("{}://www.{}/", scheme, self.domain_name())
     }
     pub fn ipv4(&self) -> String {

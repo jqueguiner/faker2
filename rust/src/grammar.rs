@@ -17,7 +17,14 @@ const IRREGULAR: &[(&str, &str)] = &[
 ];
 
 const UNCOUNTABLE: &[&str] = &[
-    "sheep", "fish", "series", "species", "money", "information", "equipment", "rice",
+    "sheep",
+    "fish",
+    "series",
+    "species",
+    "money",
+    "information",
+    "equipment",
+    "rice",
 ];
 
 /// -ves plurals whose singular ends in -fe (not -f).
@@ -39,10 +46,7 @@ pub fn pluralize(word: &str) -> String {
         }
     }
     let n = word.len();
-    if ends_with(word, "y")
-        && n >= 2
-        && !"aeiou".contains(word.as_bytes()[n - 2] as char)
-    {
+    if ends_with(word, "y") && n >= 2 && !"aeiou".contains(word.as_bytes()[n - 2] as char) {
         return format!("{}ies", &word[..n - 1]);
     }
     if ends_with(word, "s")

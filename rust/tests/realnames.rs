@@ -3,10 +3,22 @@ use faker2::{Faker, Gender};
 
 #[test]
 fn real_gender_inference() {
-    assert_eq!(Faker::infer_gender_real("Jacques", Some("FR")), Gender::Male);
-    assert_eq!(Faker::infer_gender_real("Marie", Some("FR")), Gender::Female);
-    assert_eq!(Faker::infer_gender_real("Mohammed", Some("EG")), Gender::Male);
-    assert_eq!(Faker::infer_gender_real("Zzxq", Some("FR")), Gender::Unknown);
+    assert_eq!(
+        Faker::infer_gender_real("Jacques", Some("FR")),
+        Gender::Male
+    );
+    assert_eq!(
+        Faker::infer_gender_real("Marie", Some("FR")),
+        Gender::Female
+    );
+    assert_eq!(
+        Faker::infer_gender_real("Mohammed", Some("EG")),
+        Gender::Male
+    );
+    assert_eq!(
+        Faker::infer_gender_real("Zzxq", Some("FR")),
+        Gender::Unknown
+    );
 }
 
 #[test]
@@ -42,7 +54,10 @@ fn detect_country() {
     let yuki = Faker::detect_country("Yuki", 3);
     assert_eq!(yuki[0].0, "JP");
     assert!(yuki.iter().all(|(_, s)| (0.0..=1.0).contains(s)));
-    let bjorn: Vec<String> = Faker::detect_country("Bjorn", 4).into_iter().map(|(c, _)| c).collect();
+    let bjorn: Vec<String> = Faker::detect_country("Bjorn", 4)
+        .into_iter()
+        .map(|(c, _)| c)
+        .collect();
     assert!(bjorn.contains(&"SE".to_string()) || bjorn.contains(&"NO".to_string()));
     assert!(Faker::detect_country("Zzxqwv", 3).is_empty());
 }
@@ -72,14 +87,25 @@ fn homophones_methods() {
         assert!((total - 1.0).abs() < 1e-6, "method {m} sums to {total}");
     }
     // metaphone is coarse (Xavier collides); ipa + balanced drop it
-    let meta = names(Faker::homophones("Sophie", "FR", "metaphone", 20, true, None));
+    let meta = names(Faker::homophones(
+        "Sophie",
+        "FR",
+        "metaphone",
+        20,
+        true,
+        None,
+    ));
     let ipa = names(Faker::homophones("Sophie", "FR", "ipa", 20, true, None));
-    let bal = names(Faker::homophones("Sophie", "FR", "balanced", 20, true, None));
+    let bal = names(Faker::homophones(
+        "Sophie", "FR", "balanced", 20, true, None,
+    ));
     assert!(meta.contains(&"Xavier".to_string()));
     assert!(!ipa.contains(&"Xavier".to_string()));
     assert!(!bal.contains(&"Xavier".to_string()));
     // unknown + exclude-self
     assert!(Faker::homophones("Zzxqwv", "FR", "ipa", 5, true, None).is_empty());
-    assert!(!names(Faker::homophones("Dominique", "FR", "ipa", 20, false, None))
-        .contains(&"Dominique".to_string()));
+    assert!(
+        !names(Faker::homophones("Dominique", "FR", "ipa", 20, false, None))
+            .contains(&"Dominique".to_string())
+    );
 }

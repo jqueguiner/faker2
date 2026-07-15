@@ -1,5 +1,12 @@
 # faker2 — fork with name intelligence + a Rust port
 
+[![CI](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jqueguiner/faker2/badges/coverage.json)](https://github.com/jqueguiner/faker2/actions/workflows/coverage-badge.yml)
+[![PyPI](https://img.shields.io/pypi/v/faker2.svg?cache=2)](https://pypi.org/project/faker2/)
+[![Python versions](https://img.shields.io/pypi/pyversions/faker2.svg?cache=2)](https://pypi.org/project/faker2/)
+[![Rust release](https://github.com/jqueguiner/faker2/actions/workflows/rust-release.yml/badge.svg)](https://github.com/jqueguiner/faker2/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
+
 This fork of [faker2](README.upstream.rst) adds three things on top of upstream:
 
 1. **Name intelligence** (`faker2/naming/`) — gender inference, gender-preserving

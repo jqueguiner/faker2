@@ -22,7 +22,24 @@ permissions:
   contents: write
 
 jobs:
+  # Fail fast if the release tag does not match rust/Cargo.toml's version.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches Cargo.toml version
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          tag="${tag#v}"
+          ver=$(grep -m1 '^version' rust/Cargo.toml | cut -d'"' -f2)
+          echo "tag=$tag  Cargo.toml=$ver"
+          if [ "$tag" != "$ver" ]; then
+            echo "::error::release tag v$tag != rust/Cargo.toml version $ver — bump the crate version"
+            exit 1
+          fi
+
   build:
+    needs: verify
     name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
