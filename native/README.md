@@ -1,10 +1,11 @@
-# faker2-rs
+# faker2 (pure Rust + Python binder)
 
-A thin **Python wrapper over the Rust `faker2` engine** (PyO3). All fake-data
-generation runs in Rust; Python only exposes the API.
+The `faker2` PyPI package as a **pure-Rust engine with a thin Python binder**
+(PyO3). `import faker2` loads the compiled Rust core (`faker2._native`); no
+fake-data logic runs in Python.
 
 ```python
-from faker2_rs import Faker, homophones, detect_country, infer_gender_real
+from faker2 import Faker, homophones, detect_country, infer_gender_real
 
 f = Faker(42)                              # seedable, deterministic
 f.name(); f.email(); f.address()
@@ -20,16 +21,12 @@ homophones("Dominique", "FR", "balanced")  # [("Dominique", 0.95), ...]
 
 ```bash
 cd native
-maturin build --release        # produces an abi3 wheel
+maturin build --release        # abi3 wheel (bundles the dataset)
 pip install dist/*.whl
 ```
 
 ## Scope
 
-Wraps the Rust port (`../rust`): core engine + en_US providers + the 139-country
-name intelligence. More locales are ported onto the same engine over time — see
-the repo `README.md` and `PARITY.md`.
-
-Note: the dataset (`data/first_names.parquet`) must be reachable at runtime; set
-`FAKER2_NAMES_PARQUET` to point at it if not co-located.
-```
+The Rust core (`../rust`) currently implements the engine + en_US providers +
+the 139-country name intelligence. More locales are ported into the Rust core
+over time; see the repo `README.md` and `PARITY.md`.

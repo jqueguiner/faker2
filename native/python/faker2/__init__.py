@@ -1,27 +1,24 @@
-"""faker2-rs — a thin Python wrapper over the Rust ``faker2`` engine.
+"""faker2 — pure-Rust fake-data generator with a thin Python binder.
 
-Everything here delegates to the compiled Rust core (``faker2_rs._native``,
-built with PyO3). No fake-data logic lives in Python.
+All logic lives in the compiled Rust core (``faker2._native``, built with
+PyO3). This package only binds it to Python.
 
-    >>> from faker2_rs import Faker, homophones, detect_country
+    >>> from faker2 import Faker, homophones, detect_country
     >>> f = Faker(42)
     >>> f.name()                       # doctest: +SKIP
     'Cheyenne Mills'
     >>> f.first_name_like_real("Jacques", "FR")   # doctest: +SKIP
     'Valentin'
-    >>> detect_country("Yuki", 3)[0][0]           # doctest: +SKIP
-    'JP'
 
-Scope: the Rust port currently implements the core engine, the en_US providers
-and the data-backed name intelligence (139-country gender / country / homophone
-tools). Additional locales are ported onto the same engine over time.
+Scope: the Rust core currently implements the engine, the en_US providers and
+the 139-country name intelligence (gender / country / homophones). More locales
+are ported into the Rust core over time.
 """
 
 import os as _os
 import pathlib as _pathlib
 
-# Point the Rust engine at the dataset bundled inside this package (unless the
-# user overrode it). Env is read lazily on first use, so setting it here is safe.
+# Point the Rust core at the dataset bundled in this package (unless overridden).
 _data = _pathlib.Path(__file__).parent / "data"
 for _env, _name in (
     ("FAKER2_NAMES_PARQUET", "first_names.parquet"),
@@ -48,4 +45,4 @@ __all__ = [
     "available_countries",
 ]
 
-__version__ = "0.1.0"
+__version__ = "40.28.1.post1"
