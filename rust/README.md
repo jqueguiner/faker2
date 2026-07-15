@@ -81,6 +81,10 @@ Faker::infer_gender_real("Mohammed", Some("EG"));     // Gender::Male
 let f = Faker::seeded(42);
 f.first_name_like_real("Jacques", Some("FR"));        // freq-weighted male FR name
 f.first_name_real(Some("JP"), Gender::Female);        // weighted female JP name
+
+Faker::detect_country("Yuki", 3);                     // [("JP", 0.58), ...]
+Faker::homophones("Dominique", "FR", "ipa", 6, true, None);
+// method: "metaphone" | "ipa" | "levenshtein" | "balanced"  (full parity with Python)
 ```
 
 - Frequency-weighted: common names appear proportionally more often.
