@@ -116,6 +116,16 @@ grammar::agree(3, "dog");          // "3 dogs"
 grammar::is_are(2);                // "are"
 ```
 
+## Install
+
+Prebuilt `faker2` CLI binaries for Linux (x86_64/aarch64, gnu + musl), macOS
+(Intel + Apple Silicon) and Windows are attached to each
+[GitHub Release](https://github.com/jqueguiner/faker2/releases) — download the
+archive for your platform and extract the binary. Releases are built by
+`.github/workflows/rust-release.yml` on every `v*` tag.
+
+Or build from source (below).
+
 ## Build & test
 
 ```
