@@ -247,13 +247,10 @@ impl Faker {
     }
 
     /// Random element of `(locale, provider, field)`, or `None` if empty.
+    /// Borrows the field and clones only the chosen element (no full-Vec copy).
     pub fn lpick(&self, locale: &str, provider: &str, field: &str) -> Option<String> {
-        let v = self.lfield(locale, provider, field);
-        if v.is_empty() {
-            None
-        } else {
-            Some(v[self.rng.below(v.len())].clone())
-        }
+        let v = Self::field_values(engine(), locale, provider, field)?;
+        Some(v[self.rng.below(v.len())].clone())
     }
 
     /// Expand `{{token}}` placeholders in `template` for `locale`.
