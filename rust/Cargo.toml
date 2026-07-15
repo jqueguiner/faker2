@@ -1,0 +1,24 @@
+[package]
+name = "faker2"
+version = "0.1.0"
+edition = "2021"
+description = "Rust port of the faker2 fake-data generator (en_US locale, core engine)."
+license = "MIT"
+
+[lib]
+name = "faker2"
+path = "src/lib.rs"
+
+[[bin]]
+name = "faker2"
+path = "src/bin/faker2.rs"
+
+[dependencies]
+arrow = { version = "59.1.0", default-features = false, optional = true }
+parquet = { version = "59.1.0", default-features = false, features = ["arrow", "zstd"], optional = true }
+
+[features]
+# Core crate is zero-dependency (own PRNG + std only).
+# `real-names` opts into the parquet-backed 139-country ground-truth dataset.
+default = []
+real-names = ["dep:parquet", "dep:arrow"]

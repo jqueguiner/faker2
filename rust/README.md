@@ -1,0 +1,114 @@
+# faker2 (Rust)
+
+A Rust port of the [`faker2`](../) Python fake-data generator.
+
+This port implements the **core engine** and the most-used **`en_US` providers**.
+Data lists are extracted verbatim from the Python source, so output is real
+faker data — not placeholders.
+
+## What's ported
+
+| Piece | Python source | Rust |
+|-------|---------------|------|
+| Seedable RNG + `random_int` / `random_element` | `generator.py`, `providers/__init__.py` | `src/rng.rs` |
+| `numerify` `lexify` `bothify` `hexify` | `BaseProvider` | `src/rng.rs` |
+| `{{token}}` templating (`parse`/`format`) | `generator.parse` | `src/faker.rs` |
+| person, address, internet, lorem, company, phone, color, misc/python | `providers/*` (en_US) | `src/providers/*.rs` |
+
+Not ported: the ~130 non-`en_US` locales, and the long tail of providers
+(bank, ssn, credit_card, isbn, automotive, …). The architecture is extensible —
+add a `data.rs` list + an `impl Faker` method + a `format()` arm.
+
+## Library
+
+```rust
+use faker2::Faker;
+
+let fake = Faker::seeded(42);      // deterministic; Faker::new() for random
+println!("{}", fake.name());       // Cheyenne Mills
+println!("{}", fake.email());      // cheyenne2008@owens.net
+println!("{}", fake.address());    // 40258 Herrera Manor Suite 240\nGrayburgh, MD 67882
+println!("{}", fake.parse("{{first_name}} works at {{company}}"));
+```
+
+## CLI
+
+```
+cargo run -- name                  # single value
+cargo run -- --seed 42 email       # deterministic
+cargo run -- --repeat 3 address    # 3 rows
+cargo run -- --list                # available formatters
+```
+
+## Gender-preserving name replacement
+
+Infers a first name's gender from the locale's name lists, then returns a
+different name of the **same** gender + locale:
+
+```rust
+use faker2::{Faker, Gender, Locale};
+
+let f = Faker::seeded(1);
+assert_eq!(Faker::infer_gender("Jacques", Locale::FrFR), Gender::Male);
+let repl = f.first_name_like("Jacques", Locale::FrFR);   // e.g. "Patrick"
+// repl is guaranteed male-FR.
+
+f.name_of(Gender::Female, Locale::EnUS);   // prefix/first/suffix all agree
+```
+
+CLI:
+
+```
+cargo run -- --seed 3 like Jacques fr        # -> Auguste  (Male)
+cargo run -- --repeat 3 like Marie fr_FR
+```
+
+Locales with name data: `en_US`, `fr_FR` (extend by adding arrays to
+`data.rs` + a `Locale` arm).
+
+## Real name ground truth (opt-in `real-names` feature)
+
+Backs name generation with **1.43M real names across 139 countries**, each with
+a gender and real-world frequency (`../data/first_names.parquet`). Off by
+default (keeps the core zero-dep); enable with `--features real-names`.
+
+```rust
+use faker2::{Faker, Gender};
+
+Faker::infer_gender_real("Jacques", Some("FR"));      // Gender::Male
+Faker::infer_gender_real("Mohammed", Some("EG"));     // Gender::Male
+
+let f = Faker::seeded(42);
+f.first_name_like_real("Jacques", Some("FR"));        // freq-weighted male FR name
+f.first_name_real(Some("JP"), Gender::Female);        // weighted female JP name
+```
+
+- Frequency-weighted: common names appear proportionally more often.
+- Pulls in `parquet` + `arrow` (only under this feature).
+- Dataset path overridable via `FAKER2_NAMES_PARQUET`.
+
+## Grammatical number agreement
+
+```rust
+use faker2::grammar;
+grammar::pluralize("baby");        // "babies"
+grammar::singularize("knives");    // "knife"
+grammar::agree(1, "apple");        // "an apple"
+grammar::agree(3, "dog");          // "3 dogs"
+grammar::is_are(2);                // "are"
+```
+
+## Build & test
+
+```
+cargo build
+cargo test
+```
+
+## Fidelity notes
+
+- Seeding is deterministic **within this crate** but is **not** byte-identical
+  to Python's Mersenne-Twister sequence — same seed ≠ same string across langs.
+- Name/last-name weighting (Python `OrderedDict` weights) is flattened to
+  uniform choice; the value pool is the real faker list.
+- Zero external dependencies (own SplitMix64 PRNG, std only).
