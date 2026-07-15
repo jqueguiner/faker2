@@ -26,7 +26,14 @@ _IRREGULAR = {
 _IRREGULAR_INV = {v: k for k, v in _IRREGULAR.items()}
 
 _UNCOUNTABLE = {
-    "sheep", "fish", "series", "species", "money", "information", "equipment", "rice",
+    "sheep",
+    "fish",
+    "series",
+    "species",
+    "money",
+    "information",
+    "equipment",
+    "rice",
 }
 
 # -ves words whose singular ends in -fe (not -f).
@@ -70,7 +77,7 @@ def singularize(word: str) -> str:
 
 
 def indefinite_article(word: str) -> str:
-    """"a" or "an" from the leading letter (vowel heuristic)."""
+    """ "a" or "an" from the leading letter (vowel heuristic)."""
     return "an" if word[:1].lower() in "aeiou" else "a"
 
 

@@ -1,7 +1,7 @@
 """Tests for the gender-preserving name replacement + grammar helpers."""
 
 from faker2 import Faker
-from faker2.naming.gender import first_name_like, infer_gender, _resolver
+from faker2.naming.gender import _resolver, first_name_like, infer_gender
 from faker2.naming.grammar import agree, is_are, pluralize, singularize
 
 
@@ -45,33 +45,35 @@ def test_grammar_agreement():
 
 def test_grammar_pluralize_branches():
     from faker2.naming.grammar import indefinite_article
-    assert pluralize("sheep") == "sheep"          # uncountable
-    assert pluralize("wife") == "wives"           # -fe
-    assert pluralize("wolf") == "wolves"          # -f
-    assert pluralize("bus") == "buses"            # -s
-    assert pluralize("church") == "churches"      # -ch
-    assert pluralize("day") == "days"             # vowel+y (not -ies)
-    assert pluralize("cat") == "cats"             # default
-    assert pluralize("MAN") == "men"              # irregular, case-insensitive
-    assert indefinite_article("hour") == "a"      # vowel heuristic (letter-based)
+
+    assert pluralize("sheep") == "sheep"  # uncountable
+    assert pluralize("wife") == "wives"  # -fe
+    assert pluralize("wolf") == "wolves"  # -f
+    assert pluralize("bus") == "buses"  # -s
+    assert pluralize("church") == "churches"  # -ch
+    assert pluralize("day") == "days"  # vowel+y (not -ies)
+    assert pluralize("cat") == "cats"  # default
+    assert pluralize("MAN") == "men"  # irregular, case-insensitive
+    assert indefinite_article("hour") == "a"  # vowel heuristic (letter-based)
     assert indefinite_article("egg") == "an"
 
 
 def test_grammar_singularize_branches():
-    assert singularize("sheep") == "sheep"        # uncountable
-    assert singularize("wives") == "wife"         # -ves -> -fe map
-    assert singularize("wolves") == "wolf"        # -ves -> -f
-    assert singularize("boxes") == "box"          # -es after sibilant
-    assert singularize("dogs") == "dog"           # plain -s
-    assert singularize("class") == "class"        # -ss unchanged
-    assert singularize("fish") == "fish"          # no trailing s
+    assert singularize("sheep") == "sheep"  # uncountable
+    assert singularize("wives") == "wife"  # -ves -> -fe map
+    assert singularize("wolves") == "wolf"  # -ves -> -f
+    assert singularize("boxes") == "box"  # -es after sibilant
+    assert singularize("dogs") == "dog"  # plain -s
+    assert singularize("class") == "class"  # -ss unchanged
+    assert singularize("fish") == "fish"  # no trailing s
 
 
 def test_gender_unisex_and_alias():
-    from faker2.naming.gender import UNISEX, replace_first_name, _resolver
+    from faker2.naming.gender import UNISEX, _resolver, replace_first_name
+
     r = _resolver("en_US")
     both = r._male & r._female
-    if both:                                       # a name in both pools -> unisex
+    if both:  # a name in both pools -> unisex
         name = next(iter(both))
         assert r.infer(name) == UNISEX
     # alias delegates to first_name_like
@@ -79,22 +81,25 @@ def test_gender_unisex_and_alias():
     assert isinstance(replace_first_name("John", "en_US"), str)
     # female-only name infers FEMALE; unknown name -> either-pool draw
     from faker2.naming.gender import FEMALE
+
     fem_only = next(iter(r._female - r._male), None)
     if fem_only:
         assert r.infer(fem_only) == FEMALE
-    assert isinstance(r.replace("Zzxqwv"), str)   # unknown -> _draw either pool
+    assert isinstance(r.replace("Zzxqwv"), str)  # unknown -> _draw either pool
 
 
 def test_full_name_gendered():
     from faker2.naming.gender import full_name
+
     Faker.seed(3)
     # accepts lowercase (realnames) and uppercase gender codes
     for code in ("m", "M", "f", "F"):
         nm = full_name("en_US", code)
         assert " " in nm and nm[0].isupper()
-    assert isinstance(full_name(), str)           # default random gender
+    assert isinstance(full_name(), str)  # default random gender
     # female names are mostly gender-pure (a few unisex allowed)
     from faker2.naming import realnames as rn
+
     Faker.seed(4)
     pure = sum(
         1

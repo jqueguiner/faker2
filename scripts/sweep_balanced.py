@@ -17,9 +17,9 @@ orthography settle on higher spelling weight; irregular ones on higher IPA.
 
 Run:  PYTHONPATH=. python3 scripts/sweep_balanced.py [--probes N] [--work M] [--min-names K]
 """
+
 import argparse
 import json
-import os
 
 from faker2.naming import realnames as rn
 
@@ -98,7 +98,11 @@ def score_country(table, probes, work):
                             if c["P"]:
                                 fn += 1
                             continue
-                        score = w_ipa * c["ipa_sim"] + w_spell * c["spell_sim"] + META_BONUS * c["meta"]
+                        score = (
+                            w_ipa * c["ipa_sim"]
+                            + w_spell * c["spell_sim"]
+                            + META_BONUS * c["meta"]
+                        )
                         sel = score >= mn
                         if sel and c["P"]:
                             tp += 1
@@ -111,8 +115,18 @@ def score_country(table, probes, work):
                 f1 = 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
                 key = (f1, w_ipa, cap, -mn)
                 if best is None or key > best[0]:
-                    best = (key, {"w_ipa": w_ipa, "min": mn, "cap": cap, "f1": round(f1, 3),
-                                  "tp": tp, "fp": fp, "fn": fn})
+                    best = (
+                        key,
+                        {
+                            "w_ipa": w_ipa,
+                            "min": mn,
+                            "cap": cap,
+                            "f1": round(f1, 3),
+                            "tp": tp,
+                            "fp": fp,
+                            "fn": fn,
+                        },
+                    )
     return best[1] if best else None
 
 
@@ -134,20 +148,28 @@ def main():
         r = score_country(table, args.probes, args.work)
         if r:
             result[cc] = r
-            print(f"{cc}  w_ipa={r['w_ipa']} min={r['min']} cap={r['cap']} "
-                  f"F1={r['f1']} (tp={r['tp']} fp={r['fp']} fn={r['fn']})")
+            print(
+                f"{cc}  w_ipa={r['w_ipa']} min={r['min']} cap={r['cap']} "
+                f"F1={r['f1']} (tp={r['tp']} fp={r['fp']} fn={r['fn']})"
+            )
 
     # global default = averaged best over countries (rounded to grid)
     import statistics as st
+
     def nearest(v, grid):
         return min(grid, key=lambda g: abs(g - v))
+
     default = {
         "w_ipa": nearest(st.mean(r["w_ipa"] for r in result.values()), W_IPA_GRID),
         "min": nearest(st.mean(r["min"] for r in result.values()), MIN_GRID),
         "cap": round(st.mean(r["cap"] for r in result.values())),
     }
-    payload = {"_default": default, "countries": {c: {k: r[k] for k in ("w_ipa", "min", "cap")}
-                                                  for c, r in result.items()}}
+    payload = {
+        "_default": default,
+        "countries": {
+            c: {k: r[k] for k in ("w_ipa", "min", "cap")} for c, r in result.items()
+        },
+    }
     with open(args.out, "w") as f:
         json.dump(payload, f, indent=2, sort_keys=True)
     print(f"\ncountries tuned: {len(result)}  default: {default}")

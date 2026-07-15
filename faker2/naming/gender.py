@@ -34,7 +34,8 @@ class GenderResolver:
         self._male, self._female = self._collect()
 
     def _collect(self):
-        male, female = set(), set()
+        male: set = set()
+        female: set = set()
         for provider in self.fake.get_providers():
             for attr, dest in (
                 ("first_names_male", male),

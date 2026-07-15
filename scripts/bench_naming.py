@@ -1,4 +1,5 @@
 """Python perf harness — mirror of rust/examples/bench.rs."""
+
 import time
 
 from faker2 import Faker

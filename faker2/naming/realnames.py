@@ -16,6 +16,7 @@ The parquet loads lazily on first use (~0.1s) and is cached process-wide.
 
 import bisect
 import os
+
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
 
@@ -50,6 +51,7 @@ _PARAMS_PATH = os.path.join(
 def _balanced_params() -> dict:
     try:
         import json
+
         with open(_PARAMS_PATH) as f:
             return json.load(f)
     except (OSError, ValueError):
@@ -59,6 +61,7 @@ def _balanced_params() -> dict:
 def _bal_cfg(country: str) -> dict:
     p = _balanced_params()
     return p["countries"].get(country) or p.get("_default") or _BAL_DEFAULT
+
 
 # IPA diacritics to drop before comparing phonemes (stress, length, spaces)
 _IPA_STRIP = str.maketrans("", "", "ˈˌːˑ ./")
@@ -104,8 +107,14 @@ class _NameBank:
         tbl = pq.read_table(
             path,
             columns=[
-                "name", "name_ascii", "country_code", "gender",
-                "frequency", "country_share", "phonetic", "ipa",
+                "name",
+                "name_ascii",
+                "country_code",
+                "gender",
+                "frequency",
+                "country_share",
+                "phonetic",
+                "ipa",
             ],
         )
         names = tbl.column("name").to_pylist()
@@ -148,7 +157,12 @@ class _NameBank:
                 row = by_country.setdefault(cc, {}).get(name)
                 if row is None:
                     # [ascii_lower, ipa_norm, share, metaphone]
-                    by_country[cc][name] = [(asc or name).lower(), ipa_n, csh, phon or ""]
+                    by_country[cc][name] = [
+                        (asc or name).lower(),
+                        ipa_n,
+                        csh,
+                        phon or "",
+                    ]
                 else:
                     row[2] += csh  # accumulate share across genders
             for scope in (cc, None):  # per-country and global pools
@@ -200,7 +214,9 @@ class _NameBank:
             return MALE if m > f else FEMALE
         return MALE if m else FEMALE
 
-    def draw(self, country: Optional[str], gender: str, avoid: Optional[str] = None) -> Optional[str]:
+    def draw(
+        self, country: Optional[str], gender: str, avoid: Optional[str] = None
+    ) -> Optional[str]:
         pool = self._pools.get((country, gender)) or self._pools.get((None, gender))
         if not pool:
             return None
@@ -256,7 +272,9 @@ class _NameBank:
         ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
         return [(n, w / total) for n, w in ranked[:top]]
 
-    def _balanced(self, key: str, country: str, max_distance):
+    def _balanced(
+        self, key: str, country: str, max_distance: Optional[int]
+    ) -> List[Tuple[str, float]]:
         """Consensus of IPA + metaphone + spelling, weighted by frequency.
 
         A candidate scores high only when several signals agree, so
@@ -273,7 +291,7 @@ class _NameBank:
         cap = max_distance if max_distance is not None else cfg["cap"]
 
         # candidate pool: metaphone group ∪ IPA-close names (bounds the scan)
-        pool = set()
+        pool: set = set()
         if q_phon:
             grp = self._homo.get((country, q_phon))
             if grp:
@@ -285,10 +303,10 @@ class _NameBank:
 
         out = []
         for nm in pool:
-            row = table.get(nm)
-            if not row:
+            r = table.get(nm)
+            if not r:
                 continue
-            ascii_n, ipa_n, share, phon = row
+            ascii_n, ipa_n, share, phon = r
             ipa_sim = _sim(q_ipa, ipa_n)
             spell_sim = _sim(key, ascii_n)
             meta = 1.0 if q_phon and phon == q_phon else 0.0
@@ -301,7 +319,9 @@ class _NameBank:
                 out.append((nm, share * sim))
         return out
 
-    def _fuzzy(self, key: str, country: str, method: str, max_distance):
+    def _fuzzy(
+        self, key: str, country: str, method: str, max_distance: Optional[int]
+    ) -> List[Tuple[str, float]]:
         table = self._by_country.get(country)
         if not table:
             return []
@@ -385,7 +405,12 @@ def homophones(
     frequency share; probabilities sum to 1. ``[]`` if the name is unknown.
     """
     return _bank().homophones(
-        name, country.upper() if country else "", method, top, include_self, max_distance
+        name,
+        country.upper() if country else "",
+        method,
+        top,
+        include_self,
+        max_distance,
     )
 
 
@@ -397,13 +422,15 @@ def first_name(country: Optional[str] = None, gender: str = MALE) -> Optional[st
 def first_name_like(name: str, country: Optional[str] = None) -> str:
     """Replace ``name`` with a frequency-weighted name of the **same** gender.
 
-        first_name_like("Jacques", "FR")  # -> "Nicolas" (common male FR name)
+    first_name_like("Jacques", "FR")  # -> "Nicolas" (common male FR name)
     """
     cc = country.upper() if country else None
-    g = _bank().infer(name, cc)
-    if g in (None, UNISEX):
+    inferred = _bank().infer(name, cc)
+    if inferred is None or inferred == UNISEX:
         # unknown/unisex -> keep it plausible: draw male or female by chance
         g = MALE if _fkr_random.random() < 0.5 else FEMALE
+    else:
+        g = inferred
     repl = _bank().draw(cc, g, avoid=name)
     return repl if repl is not None else name
 

@@ -4,15 +4,15 @@ import pytest
 
 pytest.importorskip("pyarrow")
 
-from faker2 import Faker
-from faker2.naming import realnames as rn
+from faker2 import Faker  # noqa: E402
+from faker2.naming import realnames as rn  # noqa: E402
 
 
 def test_infer_gender_scopes():
     assert rn.infer_gender("Jacques", "FR") == "m"
     assert rn.infer_gender("Marie", "FR") == "f"
-    assert rn.infer_gender("jacques", "fr") == "m"        # case-insensitive + lc code
-    assert rn.infer_gender("Zzxqwv", "FR") is None        # unknown
+    assert rn.infer_gender("jacques", "fr") == "m"  # case-insensitive + lc code
+    assert rn.infer_gender("Zzxqwv", "FR") is None  # unknown
     assert rn.infer_gender("Patrick") in ("m", "f", "u")  # global scope (no country)
 
 
@@ -20,8 +20,8 @@ def test_first_name_weighted():
     Faker.seed(1)
     assert isinstance(rn.first_name("JP", "f"), str)
     assert isinstance(rn.first_name("BR", "m"), str)
-    assert rn.first_name(None, "m")                        # global pool
-    assert rn.first_name("ZZ", "m")                        # unknown country -> global fallback
+    assert rn.first_name(None, "m")  # global pool
+    assert rn.first_name("ZZ", "m")  # unknown country -> global fallback
 
 
 def test_first_name_like_preserves_gender():
@@ -64,29 +64,31 @@ def test_unisex_detection_if_present():
 
 def test_detect_country():
     yuki = rn.detect_country("Yuki", top=3)
-    assert yuki and yuki[0][0] == "JP"                 # top guess Japan
-    assert all(0.0 <= s <= 1.0 for _cc, s in yuki)     # normalized scores
+    assert yuki and yuki[0][0] == "JP"  # top guess Japan
+    assert all(0.0 <= s <= 1.0 for _cc, s in yuki)  # normalized scores
     assert abs(sum(s for _cc, s in rn.detect_country("Yuki", top=999)) - 1.0) < 1e-6
     bjorn = [cc for cc, _ in rn.detect_country("Bjorn", top=4)]
-    assert "SE" in bjorn or "NO" in bjorn              # Nordic
-    assert rn.detect_country("Zzxqwv") == []           # unknown -> empty
-    assert len(rn.detect_country("Maria", top=2)) <= 2 # top-N respected
+    assert "SE" in bjorn or "NO" in bjorn  # Nordic
+    assert rn.detect_country("Zzxqwv") == []  # unknown -> empty
+    assert len(rn.detect_country("Maria", top=2)) <= 2  # top-N respected
 
 
 def test_homophones():
     h = rn.homophones("Dominique", "FR", top=6)
     names = [n for n, _p in h]
-    assert h[0][0] == "Dominique"                       # most frequent variant first
-    assert "Dominic" in names and "Dominik" in names    # same-sounding variants
-    assert abs(sum(p for _n, p in rn.homophones("Dominique", "FR", top=999)) - 1.0) < 1e-6
+    assert h[0][0] == "Dominique"  # most frequent variant first
+    assert "Dominic" in names and "Dominik" in names  # same-sounding variants
+    assert (
+        abs(sum(p for _n, p in rn.homophones("Dominique", "FR", top=999)) - 1.0) < 1e-6
+    )
     # symmetric: Dominic sees the same group
     assert "Dominique" in [n for n, _ in rn.homophones("Dominic", "FR")]
     # exclude_self drops the query name
     assert "Dominique" not in [
         n for n, _ in rn.homophones("Dominique", "FR", include_self=False)
     ]
-    assert rn.homophones("Zzxqwv", "FR") == []          # unknown -> empty
-    assert len(rn.homophones("Marc", "FR", top=3)) <= 3 # top-N respected
+    assert rn.homophones("Zzxqwv", "FR") == []  # unknown -> empty
+    assert len(rn.homophones("Marc", "FR", top=3)) <= 3  # top-N respected
 
 
 def test_homophones_methods():
@@ -107,6 +109,7 @@ def test_homophones_methods():
 
     # levenshtein respects max_distance (all within edit distance 1 of "marc")
     from faker2.naming.realnames import _levenshtein
+
     lev = rn.homophones("Marc", "FR", method="levenshtein", max_distance=1)
     assert all(_levenshtein("marc", n.lower(), 1) <= 1 for n, _ in lev)
 
@@ -117,10 +120,11 @@ def test_homophones_methods():
 
 def test_levenshtein_helper():
     from faker2.naming.realnames import _levenshtein
+
     assert _levenshtein("marc", "mark", 5) == 1
     assert _levenshtein("kitten", "sitting", 5) == 3
     assert _levenshtein("abc", "abc", 5) == 0
-    assert _levenshtein("abc", "xyzuvw", 2) == 3   # capped early -> cap+1
+    assert _levenshtein("abc", "xyzuvw", 2) == 3  # capped early -> cap+1
 
 
 def test_seed_reproducible():
