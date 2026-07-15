@@ -232,8 +232,11 @@ impl Faker {
     /// `f.gen("fr_FR", "name")`, `f.gen("ja_JP", "address")`. Returns `None`
     /// for unknown or ALGORITHMIC formatters.
     pub fn gen(&self, locale: &str, formatter: &str) -> Option<String> {
-        self.gen_depth(locale, formatter, 0)
-            .or_else(|| crate::providers::algo::dispatch(self, locale, formatter))
+        // Try the hand-written algorithmic dispatch first — it's a cheap
+        // per-provider match, and avoids the expensive field-scan fallback for
+        // the many trivial algorithmic formatters (hex_color, pyint, uuid, ...).
+        crate::providers::algo::dispatch(self, locale, formatter)
+            .or_else(|| self.gen_depth(locale, formatter, 0))
     }
 
     // ---- helpers for hand-written algorithmic providers --------------------

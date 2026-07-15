@@ -107,6 +107,9 @@ Original Faker = the pure-Python package (`from faker2 import Faker`, the fork o
 [joke2k/Faker](https://github.com/joke2k/faker)). This port = the Rust engine
 (`import faker2`, or the crate directly). Same machine, `en_US`.
 
+**Full per-formatter table (63 formatters): [`BENCHMARKS.md`](BENCHMARKS.md)** —
+62/63 are faster in Rust, geo-mean **~20×**.
+
 ### Speed — throughput (higher is better)
 
 | Formatter | Python | Rust | Speedup |
