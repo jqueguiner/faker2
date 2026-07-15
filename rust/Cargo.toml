@@ -30,3 +30,7 @@ default = []
 real-names = ["dep:parquet", "dep:arrow", "dep:serde_json"]
 # Generic locale engine: data-driven formatters across all 151 locales.
 locales = ["dep:serde_json"]
+
+[[example]]
+name = "benchfull"
+required-features = ["locales"]

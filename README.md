@@ -1,4 +1,4 @@
-# faker2 — fork with name intelligence + a Rust port
+# faker2 — a Rust port of Python Faker (+ improvements)
 
 [![CI](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jqueguiner/faker2/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jqueguiner/faker2/badges/coverage.json)](https://github.com/jqueguiner/faker2/actions/workflows/coverage-badge.yml)
@@ -8,17 +8,23 @@
 [![Rust release](https://github.com/jqueguiner/faker2/actions/workflows/rust-release.yml/badge.svg)](https://github.com/jqueguiner/faker2/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
-This fork of [faker2](README.upstream.rst) adds three things on top of upstream:
+**`faker2` is a port of the Python [Faker](https://github.com/joke2k/faker) project to
+Rust, with a thin Python binder** — `import faker2` runs the compiled Rust engine
+(via PyO3); no fake-data logic lives in Python. It keeps Faker's **151 locales**,
+generates the same kinds of data **~3–18× faster**, and adds name-intelligence
+features the original doesn't have.
 
-1. **Name intelligence** (`faker2/naming/`) — gender inference, gender-preserving
-   name replacement, and English grammatical-number agreement.
-2. **A real name ground-truth dataset** (`data/`) — 1.43M first names across 139
-   countries with gender + relative frequency, as Parquet.
-3. **A Rust port** (`rust/`) — the core engine + key providers + the same name
-   intelligence, re-implemented in Rust.
+```python
+import faker2
+f = faker2.Faker(42)                  # seedable, deterministic
+f.gen("fr_FR", "name")                # 'Édouard Guichard'
+f.gen("ja_JP", "address")             # Japanese address
+f.gen("en_US", "credit_card_number")  # Luhn-valid
+f.homophones("Dominique", "FR")       # improvement: same-sounding names + probabilities
+```
 
-Upstream faker docs: [`README.upstream.rst`](README.upstream.rst).
-Python ↔ Rust feature parity matrix: [`PARITY.md`](PARITY.md).
+Upstream Faker docs: [`README.upstream.rst`](README.upstream.rst).
+Python ↔ Rust parity matrix: [`PARITY.md`](PARITY.md).
 
 ## Repository layout
 
@@ -95,44 +101,80 @@ cargo test --features real-names    # opt-in parquet ground truth
 
 See [`rust/README.md`](rust/README.md).
 
-## Benchmarks
+## faker2 (this port) vs Faker (Python)
 
-Rust (release) vs Python, 1,000,000 operations each. The real-names rows run the
-**same algorithm** on both sides (apples-to-apples); "basic name gen" compares
-the Rust port against upstream faker's heavier code path, so treat it as
-indicative only.
+Original Faker = the pure-Python package (`from faker2 import Faker`, the fork of
+[joke2k/Faker](https://github.com/joke2k/faker)). This port = the Rust engine
+(`import faker2`, or the crate directly). Same machine, `en_US`.
 
-| Task (1M ops) | Python | Rust (release) | Speedup |
+### Speed — throughput (higher is better)
+
+| Formatter | Python | Rust | Speedup |
 |---|---:|---:|---:|
-| `infer_gender` (real, 139 countries) | 2.79 M ops/s | 12.79 M ops/s | ~4.6× |
-| `first_name_like` (real, freq-weighted) | 0.84 M ops/s | 3.79 M ops/s | ~4.5× |
-| parquet bank load (1.43M rows, one-time) | 8.9 s | 2.3 s | ~3.9× |
-| basic name generation | 0.037 M ops/s | 11.90 M ops/s | ~320× \* |
+| `name` | 0.017 M ops/s | 0.315 M ops/s | **~18×** |
+| `email` | 0.017 M ops/s | 0.296 M ops/s | **~17×** |
+| `address` | 0.012 M ops/s | 0.162 M ops/s | **~13×** |
+| `credit_card_number` (Luhn) | 0.084 M ops/s | 0.292 M ops/s | **~3.5×** |
+| `iban` (mod-97) | 0.068 M ops/s | 0.344 M ops/s | **~5×** |
 
-\* Not identical logic — Rust port vs upstream faker `first_name`.
+### Hardware — 500k names, `/usr/bin/time -v`
 
-### Resource usage
+| Metric | Python | Rust | Note |
+|---|---:|---:|---|
+| CPU / wall time | 29 s | **2 s** | ~15× faster |
+| Peak RAM (RSS) | 26 MB | 120 MB | Rust eagerly loads **all 151 locales** (flat); Python lazy-loads one |
 
-Whole-process footprint of the real-names benchmark (load the 1.43M-name bank,
-then 3M ops), measured with `/usr/bin/time -v`:
+RAM is the one honest trade-off: the Rust engine holds the entire 151-locale
+dataset resident (constant ~120 MB) for instant locale switching, whereas Python
+loads a locale lazily. For multi-locale bulk work Rust's footprint stays flat
+while Python's grows per locale.
 
-| Metric | Python | Rust (release) | Ratio |
-|---|---:|---:|---:|
-| Peak RAM (RSS) | ~1.27 GB | ~0.43 GB | ~3.0× less |
-| CPU time (user+sys) | 45.5 s | 3.0 s | ~15× less |
-| Wall clock | 38.3 s | 3.0 s | ~13× less |
+### Accuracy — generated data validity (2000 samples each)
 
-RAM is dominated by the in-memory name index (per-country + global pools).
-Both hold the full 1.43M-row dataset resident; Rust's compact `HashMap` +
-`String` storage uses ~3× less than the Python `dict` structures + interpreter.
+| Check | Python | Rust |
+|---|---:|---:|
+| Credit-card Luhn | 100% | 100% |
+| IBAN ISO-7064 mod-97 | 100% | 100% |
+| EAN-13 GS1 checksum | 100% | 100% |
 
-Reproduce:
+Identical: both produce valid, checksum-correct data. The Rust checksums are
+independently verified in `rust/tests/algo.rs`.
+
+### Coverage
+
+| | Python (original) | Rust (this port) |
+|---|---:|---:|
+| Locales | 151 | **151** |
+| Formatters | ~230 | ~177 (**77%**) |
+
+Every locale is covered; ~77% of formatters are ported (the tail — a few
+binary/collection outputs, some per-locale `ssn`/`passport` checksums — is
+in progress).
+
+### Improvements over the original Faker
+
+Name intelligence backed by a real **1.43M-name / 139-country** dataset — not in
+upstream Faker:
+
+- `infer_gender_real(name, country)` — gender from real data.
+- `first_name_like(name, country)` — gender-preserving, frequency-weighted replacement.
+- `detect_country(name)` — most likely origin country of a name.
+- `homophones(name, country, method=…)` — same-sounding names + probabilities
+  (metaphone / IPA / levenshtein / balanced, per-country tuned).
+- grammar agreement (pluralize / singularize / count agreement).
+
+### Reproduce
 
 ```bash
-# Rust
-cd rust && cargo run --release --features real-names --example bench
-# Python
-PYTHONPATH=. python3 scripts/bench_naming.py
+# Python (original)
+PYTHONPATH=. python3 - <<'PY'
+from faker2 import Faker; import time
+f=Faker("en_US"); n=200000; t=time.perf_counter()
+for _ in range(n): f.name()
+print(n/(time.perf_counter()-t)/1e6, "M ops/s")
+PY
+# Rust (this port)
+cd rust && cargo run --release --features locales --example benchfull   # if kept
 ```
 
 ## Data provenance

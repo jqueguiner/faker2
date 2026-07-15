@@ -1,0 +1,14 @@
+# Install with:  pip install pre-commit && pre-commit install
+# The coverage gate blocks a commit if line coverage drops below 95%.
+repos:
+  - repo: local
+    hooks:
+      - id: coverage-95
+        name: coverage >= 95%
+        entry: >
+          bash -c 'python3 -m coverage run --source=faker2 -m pytest tests -q
+          && python3 -m coverage report --fail-under=95'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
