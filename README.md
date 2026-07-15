@@ -10,6 +10,7 @@ This fork of [faker2](README.upstream.rst) adds three things on top of upstream:
    intelligence, re-implemented in Rust.
 
 Upstream faker docs: [`README.upstream.rst`](README.upstream.rst).
+Python ↔ Rust feature parity matrix: [`PARITY.md`](PARITY.md).
 
 ## Repository layout
 

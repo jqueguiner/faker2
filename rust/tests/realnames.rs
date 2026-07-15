@@ -47,6 +47,18 @@ fn detect_country() {
     assert!(Faker::detect_country("Zzxqwv", 3).is_empty());
 }
 
+#[test]
+fn available_countries() {
+    let ccs = Faker::available_countries();
+    assert!(ccs.len() >= 130);
+    assert!(ccs.contains(&"FR".to_string()) && ccs.contains(&"US".to_string()));
+    // sorted + deduped
+    let mut sorted = ccs.clone();
+    sorted.sort();
+    sorted.dedup();
+    assert_eq!(ccs, sorted);
+}
+
 fn names(v: Vec<(String, f64)>) -> Vec<String> {
     v.into_iter().map(|(n, _)| n).collect()
 }

@@ -83,3 +83,22 @@ def test_gender_unisex_and_alias():
     if fem_only:
         assert r.infer(fem_only) == FEMALE
     assert isinstance(r.replace("Zzxqwv"), str)   # unknown -> _draw either pool
+
+
+def test_full_name_gendered():
+    from faker2.naming.gender import full_name
+    Faker.seed(3)
+    # accepts lowercase (realnames) and uppercase gender codes
+    for code in ("m", "M", "f", "F"):
+        nm = full_name("en_US", code)
+        assert " " in nm and nm[0].isupper()
+    assert isinstance(full_name(), str)           # default random gender
+    # female names are mostly gender-pure (a few unisex allowed)
+    from faker2.naming import realnames as rn
+    Faker.seed(4)
+    pure = sum(
+        1
+        for _ in range(40)
+        if rn.infer_gender(full_name("fr_FR", "f").split()[0], "FR") in ("f", "u", None)
+    )
+    assert pure >= 32

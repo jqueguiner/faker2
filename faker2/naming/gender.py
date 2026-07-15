@@ -98,3 +98,17 @@ def first_name_like(name: str, locale: str = "en_US") -> str:
 # Alias matching the shape the user asked for: replace(field_value, locale).
 def replace_first_name(name: str, locale: str = "en_US") -> str:
     return first_name_like(name, locale)
+
+
+def full_name(locale: str = "en_US", gender: Optional[str] = None) -> str:
+    """A gender-pure full name. Parity with the Rust ``Faker::name_of``.
+    ``gender`` is ``"m"``/``"f"``; ``None`` picks one.
+
+    Uses gendered first names directly (upstream ``name_female`` is not always
+    gender-pure across locales).
+    """
+    fake = _resolver(locale).fake
+    gu = (gender or "").upper()  # tolerate "m"/"f" (realnames) and "M"/"F"
+    g = gu if gu in (MALE, FEMALE) else (MALE if fake.random.random() < 0.5 else FEMALE)
+    first = fake.first_name_male() if g == MALE else fake.first_name_female()
+    return f"{first} {fake.last_name()}"

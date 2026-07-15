@@ -531,6 +531,11 @@ impl Faker {
         bank().detect_country(name, top)
     }
 
+    /// ISO codes with name data (139). Mirrors Python `available_countries()`.
+    pub fn available_countries() -> Vec<String> {
+        bank().countries()
+    }
+
     /// Same-sounding names in a country with probabilities.
     ///
     /// `method`: `"metaphone"` | `"ipa"` | `"levenshtein"` | `"balanced"`.
