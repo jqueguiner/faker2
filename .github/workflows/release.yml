@@ -161,4 +161,5 @@ jobs:
         continue-on-error: true
         with:
           packages-dir: pydist
+          password: ${{ secrets.PYPI_API_TOKEN }}
           skip-existing: true
