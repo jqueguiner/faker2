@@ -1,7 +1,7 @@
 //! Company provider — mirrors `faker2.providers.company` (en_US).
 
-use crate::faker::Faker;
 use super::data::*;
+use crate::faker::Faker;
 
 impl Faker {
     pub fn company_suffix(&self) -> &'static str {

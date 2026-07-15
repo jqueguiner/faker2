@@ -1,7 +1,7 @@
 //! Phone, color, python/misc providers.
 
-use crate::faker::Faker;
 use super::data::*;
+use crate::faker::Faker;
 
 impl Faker {
     // ---- phone_number ------------------------------------------------------
@@ -38,9 +38,7 @@ impl Faker {
     }
     /// RFC-4122-ish v4 UUID (uses this crate's PRNG, not crypto-strong).
     pub fn uuid4(&self) -> String {
-        let h = |n: usize, f: &Faker| {
-            (0..n).map(|_| f.rng.hexify("^", false)).collect::<String>()
-        };
+        let h = |n: usize, f: &Faker| (0..n).map(|_| f.rng.hexify("^", false)).collect::<String>();
         format!(
             "{}-{}-4{}-{}{}-{}",
             h(8, self),

@@ -1,7 +1,7 @@
 //! Address provider — mirrors `faker2.providers.address` (en_US).
 
-use crate::faker::Faker;
 use super::data::*;
+use crate::faker::Faker;
 
 impl Faker {
     pub fn building_number(&self) -> String {

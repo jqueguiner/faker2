@@ -21,8 +21,8 @@
 mod faker;
 mod gender;
 pub mod grammar;
-mod rng;
 pub mod providers;
+mod rng;
 
 #[cfg(feature = "real-names")]
 mod realnames;

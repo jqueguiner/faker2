@@ -1,7 +1,7 @@
 //! Person provider — mirrors `faker2.providers.person` (en_US).
 
-use crate::faker::Faker;
 use super::data::*;
+use crate::faker::Faker;
 
 impl Faker {
     pub fn first_name_male(&self) -> &'static str {

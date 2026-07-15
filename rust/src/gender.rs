@@ -129,13 +129,21 @@ impl Faker {
         let (suf_m, suf_f): (&[&str], &[&str]) = (SUFFIXES_MALE, SUFFIXES_FEMALE);
         let prefix = if roll <= 20 {
             let p = if g == Gender::Male { pre_m } else { pre_f };
-            if p.is_empty() { "" } else { self.rng.choice_str(p) }
+            if p.is_empty() {
+                ""
+            } else {
+                self.rng.choice_str(p)
+            }
         } else {
             ""
         };
         let suffix = if roll > 20 && roll <= 45 {
             let s = if g == Gender::Male { suf_m } else { suf_f };
-            if s.is_empty() { "" } else { self.rng.choice_str(s) }
+            if s.is_empty() {
+                ""
+            } else {
+                self.rng.choice_str(s)
+            }
         } else {
             ""
         };

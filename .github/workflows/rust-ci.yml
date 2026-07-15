@@ -1,0 +1,53 @@
+name: Rust CI
+
+# Gate every PR (and push to master) on rustfmt, clippy and the test suite for
+# the Rust crate — both default features and the data-backed `real-names`.
+
+on:
+  pull_request:
+    paths:
+      - "rust/**"
+      - "data/**"
+      - ".github/workflows/rust-ci.yml"
+  push:
+    branches: [master]
+    paths:
+      - "rust/**"
+      - "data/**"
+      - ".github/workflows/rust-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: rustfmt
+        run: cargo fmt --check
+
+      - name: clippy
+        run: cargo clippy --all-targets --features real-names -- -D warnings
+
+      - name: test (default features)
+        run: cargo test
+
+      - name: test (real-names)
+        run: cargo test --features real-names
