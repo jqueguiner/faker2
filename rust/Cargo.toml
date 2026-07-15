@@ -28,3 +28,5 @@ serde_json = { version = "1", optional = true }
 # `real-names` opts into the parquet-backed 139-country ground-truth dataset.
 default = []
 real-names = ["dep:parquet", "dep:arrow", "dep:serde_json"]
+# Generic locale engine: data-driven formatters across all 151 locales.
+locales = ["dep:serde_json"]

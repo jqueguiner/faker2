@@ -23,6 +23,8 @@ _data = _pathlib.Path(__file__).parent / "data"
 for _env, _name in (
     ("FAKER2_NAMES_PARQUET", "first_names.parquet"),
     ("FAKER2_BALANCED_PARAMS", "balanced_params.json"),
+    ("FAKER2_LOCALES_JSON", "locales.json"),
+    ("FAKER2_RECIPES_JSON", "recipes.json"),
 ):
     if _env not in _os.environ:
         _f = _data / _name
@@ -35,6 +37,8 @@ from ._native import (  # noqa: E402
     detect_country,
     homophones,
     infer_gender_real,
+    locale_formatters,
+    locales,
 )
 
 __all__ = [
@@ -43,6 +47,8 @@ __all__ = [
     "detect_country",
     "homophones",
     "available_countries",
+    "locales",
+    "locale_formatters",
 ]
 
 __version__ = "40.28.1.post1"

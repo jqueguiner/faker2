@@ -29,4 +29,6 @@ features = ["pyo3/extension-module"]
 include = [
     { path = "python/faker2/data/first_names.parquet", format = "wheel" },
     { path = "python/faker2/data/balanced_params.json", format = "wheel" },
+    { path = "python/faker2/data/locales.json", format = "wheel" },
+    { path = "python/faker2/data/recipes.json", format = "wheel" },
 ]
