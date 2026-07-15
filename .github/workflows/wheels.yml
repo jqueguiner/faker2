@@ -45,7 +45,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: build
-          args: --release --out dist -m native/pyproject.toml
+          args: --release --out dist -m native/Cargo.toml
           target: ${{ matrix.target }}
           manylinux: ${{ matrix.manylinux }}
 
