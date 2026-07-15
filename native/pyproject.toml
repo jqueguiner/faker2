@@ -1,0 +1,32 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "faker2-rs"
+version = "0.1.0"
+description = "Rust-backed faker2: a thin Python wrapper over the Rust faker2 engine (PyO3)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/jqueguiner/faker2"
+Documentation = "https://jqueguiner.github.io/faker2/"
+
+[tool.maturin]
+# Mixed project: pure-Python wrapper in ./python, compiled core as faker2_rs._native
+python-source = "python"
+module-name = "faker2_rs._native"
+manifest-path = "Cargo.toml"
+features = ["pyo3/extension-module"]
+# Force-bundle the dataset (copied from ../data at build time; git-ignored copy).
+include = [
+    { path = "python/faker2_rs/data/first_names.parquet", format = "wheel" },
+    { path = "python/faker2_rs/data/balanced_params.json", format = "wheel" },
+]

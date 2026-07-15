@@ -1,0 +1,16 @@
+[package]
+name = "faker2_native"
+version = "0.1.0"
+edition = "2021"
+description = "PyO3 bindings exposing the Rust faker2 engine to Python."
+license = "MIT"
+
+[lib]
+name = "faker2_native"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+# The pure-Rust engine + the data-backed name intelligence.
+faker2 = { path = "../rust", features = ["real-names"] }
+pyo3 = { version = "0.29", features = ["extension-module", "abi3-py39"] }
