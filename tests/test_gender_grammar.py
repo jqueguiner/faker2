@@ -1,5 +1,7 @@
 """Tests for the gender-preserving name replacement + grammar helpers."""
 
+import pytest
+
 from faker2 import Faker
 from faker2.naming.gender import _resolver, first_name_like, infer_gender
 from faker2.naming.grammar import agree, is_are, pluralize, singularize
@@ -98,6 +100,7 @@ def test_full_name_gendered():
         assert " " in nm and nm[0].isupper()
     assert isinstance(full_name(), str)  # default random gender
     # female names are mostly gender-pure (a few unisex allowed)
+    pytest.importorskip("pyarrow")  # realnames-backed check needs the dataset lib
     from faker2.naming import realnames as rn
 
     Faker.seed(4)
