@@ -1,0 +1,77 @@
+name: Wheels (faker2-rs)
+
+# Build the Rust-backed `faker2-rs` wheels (PyO3/maturin) for every platform.
+# On a `v*` tag the wheels are attached to the GitHub Release; if a
+# PYPI_API_TOKEN secret is present they are also published to PyPI.
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - "native/**"
+      - "rust/**"
+      - "data/**"
+      - ".github/workflows/wheels.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux, runner: ubuntu-latest, target: x86_64, manylinux: auto }
+          - { platform: linux, runner: ubuntu-latest, target: aarch64, manylinux: auto }
+          - { platform: macos, runner: macos-latest, target: aarch64, manylinux: "" }
+          - { platform: macos, runner: macos-latest, target: x86_64, manylinux: "" }
+          - { platform: windows, runner: windows-latest, target: x64, manylinux: "" }
+    steps:
+      - uses: actions/checkout@v4
+
+      # Bundle the dataset into the package before building.
+      - name: Stage dataset
+        shell: bash
+        run: |
+          mkdir -p native/python/faker2_rs/data
+          cp data/first_names.parquet data/balanced_params.json native/python/faker2_rs/data/
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -m native/pyproject.toml
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.platform }}-${{ matrix.target }}
+          path: dist/*.whl
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+      - name: Attach wheels to the Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.whl
+      - name: Publish to PyPI (if token set)
+        env:
+          TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        if: env.TOKEN != ''
+        run: |
+          python -m pip install --upgrade twine
+          twine upload --non-interactive -u __token__ -p "$TOKEN" dist/*.whl
