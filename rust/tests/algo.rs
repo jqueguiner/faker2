@@ -1,4 +1,5 @@
 #![cfg(feature = "locales")]
+#![allow(clippy::all)]
 use faker2::Faker;
 
 fn digits(s: &str) -> Vec<u32> {
