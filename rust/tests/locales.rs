@@ -9,7 +9,7 @@ fn all_locales_generate_names() {
     // name resolves (no leftover {{tokens}}) for nearly every locale
     let clean = locs
         .iter()
-        .filter(|l| f.gen(l, "name").map_or(false, |s| !s.contains("{{")))
+        .filter(|l| f.gen(l, "name").is_some_and(|s| !s.contains("{{")))
         .count();
     assert!(clean >= 145, "only {clean} locales produced a clean name");
 }

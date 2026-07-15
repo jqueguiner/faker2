@@ -233,6 +233,32 @@ impl Faker {
     /// for unknown or ALGORITHMIC formatters.
     pub fn gen(&self, locale: &str, formatter: &str) -> Option<String> {
         self.gen_depth(locale, formatter, 0)
+            .or_else(|| crate::providers::algo::dispatch(self, locale, formatter))
+    }
+
+    // ---- helpers for hand-written algorithmic providers --------------------
+
+    /// Cloned value list for `(locale, provider, field)`, en_US/en fallback.
+    /// Empty vec if the field is absent.
+    pub fn lfield(&self, locale: &str, provider: &str, field: &str) -> Vec<String> {
+        Self::field_values(engine(), locale, provider, field)
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    /// Random element of `(locale, provider, field)`, or `None` if empty.
+    pub fn lpick(&self, locale: &str, provider: &str, field: &str) -> Option<String> {
+        let v = self.lfield(locale, provider, field);
+        if v.is_empty() {
+            None
+        } else {
+            Some(v[self.rng.below(v.len())].clone())
+        }
+    }
+
+    /// Expand `{{token}}` placeholders in `template` for `locale`.
+    pub fn lparse(&self, locale: &str, template: &str) -> String {
+        self.parse_locale(locale, template, 0)
     }
 
     /// Locales that have data (151).

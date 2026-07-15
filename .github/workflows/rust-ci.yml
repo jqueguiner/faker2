@@ -44,10 +44,13 @@ jobs:
         run: cargo fmt --check
 
       - name: clippy
-        run: cargo clippy --all-targets --features real-names -- -D warnings
+        run: cargo clippy --all-targets --features real-names,locales -- -D warnings
 
       - name: test (default features)
         run: cargo test
 
       - name: test (real-names)
         run: cargo test --features real-names
+
+      - name: test (locales)
+        run: cargo test --features locales
