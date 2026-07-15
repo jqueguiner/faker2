@@ -57,6 +57,31 @@ cargo test --features real-names    # opt-in parquet ground truth
 
 See [`rust/README.md`](rust/README.md).
 
+## Benchmarks
+
+Rust (release) vs Python, 1,000,000 operations each. The real-names rows run the
+**same algorithm** on both sides (apples-to-apples); "basic name gen" compares
+the Rust port against upstream faker's heavier code path, so treat it as
+indicative only.
+
+| Task (1M ops) | Python | Rust (release) | Speedup |
+|---|---:|---:|---:|
+| `infer_gender` (real, 139 countries) | 2.79 M ops/s | 12.79 M ops/s | ~4.6× |
+| `first_name_like` (real, freq-weighted) | 0.84 M ops/s | 3.79 M ops/s | ~4.5× |
+| parquet bank load (1.43M rows, one-time) | 8.9 s | 2.3 s | ~3.9× |
+| basic name generation | 0.037 M ops/s | 11.90 M ops/s | ~320× \* |
+
+\* Not identical logic — Rust port vs upstream faker `first_name`.
+
+Reproduce:
+
+```bash
+# Rust
+cd rust && cargo run --release --features real-names --example bench
+# Python
+PYTHONPATH=. python3 scripts/bench_naming.py
+```
+
 ## Data provenance
 
 The name dataset was extracted from a PostgreSQL dump and normalized so

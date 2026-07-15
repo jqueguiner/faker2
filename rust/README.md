@@ -87,6 +87,18 @@ f.first_name_real(Some("JP"), Gender::Female);        // weighted female JP name
 - Pulls in `parquet` + `arrow` (only under this feature).
 - Dataset path overridable via `FAKER2_NAMES_PARQUET`.
 
+### Benchmark
+
+`cargo run --release --features real-names --example bench` (1M ops):
+
+| Task | Rust (release) | Python |
+|---|---:|---:|
+| `infer_gender_real` | 12.79 M ops/s | 2.79 M ops/s |
+| `first_name_like_real` | 3.79 M ops/s | 0.84 M ops/s |
+| bank load (1.43M rows) | 2.3 s | 8.9 s |
+
+~4–5× faster on identical logic. See top-level `README.md` for the full table.
+
 ## Grammatical number agreement
 
 ```rust
