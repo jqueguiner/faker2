@@ -1,9 +1,9 @@
 """Sweep balanced-homophone weights per country/language.
 
-No labelled homophone set exists. To avoid a circular objective (the dataset's
-IPA is a single English G2P, so defining truth via IPA just maximises the IPA
-weight), we build pseudo ground truth from SPELLING + METAPHONE only, leaving
-IPA as an independent signal the sweep can genuinely evaluate per language:
+No labelled homophone set exists. To keep the objective independent of the
+phonetic signal being tuned, we build pseudo ground truth from SPELLING +
+METAPHONE only, leaving the per-language g2p2 phonetic similarity as the
+independent signal the sweep evaluates:
 
   * POSITIVE  = metaphone-match AND spelling-close (<=1 edit)
                 -> near-identical name, almost certainly a real variant.
