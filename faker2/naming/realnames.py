@@ -114,7 +114,7 @@ class _NameBank:
                 "frequency",
                 "country_share",
                 "phonetic",
-                "ipa",
+                "g2p_ipa",
             ],
         )
         names = tbl.column("name").to_pylist()
@@ -124,7 +124,7 @@ class _NameBank:
         freqs = tbl.column("frequency").to_pylist()
         shares = tbl.column("country_share").to_pylist()
         phonetics = tbl.column("phonetic").to_pylist()
-        ipas = tbl.column("ipa").to_pylist()
+        ipas = tbl.column("g2p_ipa").to_pylist()
 
         # (country, gender) -> (names[], cumulative_weights[]).
         # Weights are *relative* frequencies (shares), never raw counts.
@@ -151,7 +151,7 @@ class _NameBank:
                 homo.setdefault((cc, phon), {})
                 homo[(cc, phon)][name] = homo[(cc, phon)].get(name, 0.0) + csh
             if cc:
-                ipa_n = _norm_ipa(ipa) if ipa else ""
+                ipa_n = ipa or ""  # raw g2p per-language IPA
                 row = by_country.setdefault(cc, {}).get(name)
                 if row is None:
                     # [ascii_lower, ipa_norm, share, metaphone]

@@ -21,7 +21,17 @@ Run:  PYTHONPATH=. python3 scripts/sweep_balanced.py [--probes N] [--work M] [--
 import argparse
 import json
 
+import g2p2
+
 from faker2.naming import realnames as rn
+
+
+def g2p_sim(a, b):
+    """Per-language phonetic similarity of two g2p IPA strings (0..1)."""
+    if not a or not b:
+        return 0.0
+    return g2p2.similarity(a, b, "weighted")
+
 
 W_IPA_GRID = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 MIN_GRID = [0.40, 0.45, 0.50, 0.55, 0.60]
@@ -67,7 +77,7 @@ def candidates_for(probe, working):
             continue
         out.append(
             {
-                "ipa_sim": sim(p_ipa, c_ipa),
+                "ipa_sim": g2p_sim(p_ipa, c_ipa),
                 "spell_sim": sim(p_ascii, c_ascii),
                 "meta": meta,
                 "idist": idist,
