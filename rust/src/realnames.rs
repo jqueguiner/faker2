@@ -130,6 +130,17 @@ fn sim(a: &[char], b: &[char]) -> f64 {
     1.0 - levenshtein(a, b, m) as f64 / m as f64
 }
 
+/// Phonetic similarity of two IPA strings using g2p's articulatory
+/// feature-weighted phoneme alignment (jqueguiner/g2p2). 0..1, 0 if empty.
+fn g2p_ipa_sim(a: &[char], b: &[char]) -> f64 {
+    if a.is_empty() || b.is_empty() {
+        return 0.0;
+    }
+    let sa: String = a.iter().collect();
+    let sb: String = b.iter().collect();
+    g2p::similarity(&sa, &sb, g2p::Method::Weighted) as f64
+}
+
 fn col_strings(col: &dyn Array) -> Vec<Option<String>> {
     if let Some(a) = col.as_any().downcast_ref::<StringArray>() {
         return (0..a.len())
@@ -443,10 +454,17 @@ impl NameBank {
         if query.is_empty() {
             return vec![];
         }
+        // IPA method: select by g2p articulatory similarity above a threshold
+        // (higher cap = looser). Levenshtein method: char edit distance <= cap.
+        let ipa_thresh = (1.0 - 0.07 * cap as f64).max(0.6);
         let mut out = vec![];
         for (nm, row) in table {
-            let target = if method == IPA { &row.ipa } else { &row.ascii };
-            if !target.is_empty() && levenshtein(&query, target, cap) <= cap {
+            let keep = if method == IPA {
+                !row.ipa.is_empty() && g2p_ipa_sim(&query, &row.ipa) >= ipa_thresh
+            } else {
+                !row.ascii.is_empty() && levenshtein(&query, &row.ascii, cap) <= cap
+            };
+            if keep {
                 out.push((nm.clone(), row.share));
             }
         }
@@ -499,7 +517,7 @@ impl NameBank {
                 Some(r) => r,
                 None => continue,
             };
-            let ipa_sim = sim(&q_ipa, &row.ipa);
+            let ipa_sim = g2p_ipa_sim(&q_ipa, &row.ipa);
             let spell_sim = sim(&q_ascii, &row.ascii);
             let meta = if !q_phon.is_empty() && row.phon == q_phon {
                 1.0

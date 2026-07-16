@@ -312,6 +312,7 @@ name = "faker2"
 version = "0.1.0"
 dependencies = [
  "arrow",
+ "g2p",
  "parquet",
  "serde_json",
 ]
@@ -355,6 +356,11 @@ dependencies = [
  "pin-project-lite",
  "slab",
 ]
+
+[[package]]
+name = "g2p"
+version = "0.1.2"
+source = "git+https://github.com/jqueguiner/g2p2#bc11320888d1f48b78f080b74673eb0452a02746"
 
 [[package]]
 name = "getrandom"
