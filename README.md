@@ -72,7 +72,8 @@ population counts are intentionally not in the dataset.
 
 - `"metaphone"` (default) — double-metaphone group; fast but coarse (may pull in
   near-homophones, e.g. Sophie↔Xavier).
-- `"ipa"` — IPA transcription within `max_distance` edits; precise (drops Xavier).
+- `"ipa"` — articulatory phonetic similarity via [g2p2](https://github.com/jqueguiner/g2p2)
+  (feature-weighted phoneme alignment), precise.
 - `"levenshtein"` — spelling within `max_distance` edits; orthographic variants.
 - `"balanced"` — IPA + spelling consensus with **per-country weights** swept
   offline (`scripts/sweep_balanced.py` → `data/balanced_params.json`, 119
