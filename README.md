@@ -72,8 +72,11 @@ population counts are intentionally not in the dataset.
 
 - `"metaphone"` (default) — double-metaphone group; fast but coarse (may pull in
   near-homophones, e.g. Sophie↔Xavier).
-- `"ipa"` — articulatory phonetic similarity via [g2p2](https://github.com/jqueguiner/g2p2)
-  (feature-weighted phoneme alignment), precise.
+- `"ipa"` — **per-language** phonetic similarity: every name is phonemized in
+  its own language with [g2p2](https://github.com/jqueguiner/g2p2) (`g2p_ipa`
+  column) and compared with g2p2's articulatory feature-weighted alignment — so
+  Mohammed→Mohammad, Giovanni→Gianni use real Arabic/Italian phonetics, not an
+  anglocentric transcription.
 - `"levenshtein"` — spelling within `max_distance` edits; orthographic variants.
 - `"balanced"` — IPA + spelling consensus with **per-country weights** swept
   offline (`scripts/sweep_balanced.py` → `data/balanced_params.json`, 119
