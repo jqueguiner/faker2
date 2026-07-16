@@ -11,13 +11,20 @@ pub mod company;
 pub mod credit_card;
 pub mod currency;
 pub mod date_time;
+pub mod doi;
 pub mod file;
+pub mod geo;
 pub mod internet;
 pub mod isbn;
+pub mod job;
+pub mod lorem;
 pub mod misc;
+pub mod passport;
+pub mod person;
 pub mod phone_number;
 pub mod python;
 pub mod sbn;
+pub mod user_agent;
 
 /// Try each provider module; first Some wins.
 pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
@@ -36,5 +43,12 @@ pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
         .or_else(|| sbn::dispatch(f, locale, name))
         .or_else(|| phone_number::dispatch(f, locale, name))
         .or_else(|| address::dispatch(f, locale, name))
+        .or_else(|| lorem::dispatch(f, locale, name))
+        .or_else(|| person::dispatch(f, locale, name))
+        .or_else(|| job::dispatch(f, locale, name))
+        .or_else(|| geo::dispatch(f, locale, name))
+        .or_else(|| doi::dispatch(f, locale, name))
+        .or_else(|| user_agent::dispatch(f, locale, name))
         .or_else(|| date_time::dispatch(f, locale, name))
+        .or_else(|| passport::dispatch(f, locale, name))
 }
