@@ -26,6 +26,64 @@ f.homophones("Dominique", "FR")       # (name, probability, phonetic_similarity)
 Upstream Faker docs: [`README.upstream.rst`](README.upstream.rst).
 Python ↔ Rust parity matrix: [`PARITY.md`](PARITY.md).
 
+## Install
+
+**Python** — from [PyPI](https://pypi.org/project/faker2/) (Rust-backed wheels,
+abi3, for Linux x86_64/aarch64, macOS Intel/Apple-Silicon, Windows):
+
+```bash
+pip install faker2
+```
+
+**Rust** — the crate (git for now):
+
+```bash
+cargo add faker2 --git https://github.com/jqueguiner/faker2 --features real-names,locales
+```
+
+Prebuilt CLI binaries and wheels are attached to every
+[GitHub Release](https://github.com/jqueguiner/faker2/releases).
+
+## Python API (the binder)
+
+`import faker2` loads the compiled Rust core (`faker2._native`, PyO3). No
+fake-data logic runs in Python.
+
+```python
+import faker2
+
+f = faker2.Faker(42)                       # seedable; Faker() for random
+f.gen("fr_FR", "name")                     # any of 151 locales, ~213 formatters
+f.email(); f.address(); f.company()        # en_US convenience methods
+
+# name intelligence (real 1.43M-name, 139-country dataset)
+f.first_name_like_real("Jacques", "FR")    # gender-preserving, freq-weighted
+faker2.infer_gender_real("Mohammed", "EG") # "m"
+faker2.detect_country("Yuki")              # [("JP", 0.58), ...]
+faker2.homophones("Dominique", "FR", "balanced", 5, True, None)
+#   -> [("Dominique", 0.94, 1.0), ("Dominic", 0.02, 0.80), ...]  (name, prob, similarity)
+faker2.locales()                           # 151
+```
+
+Module functions: `infer_gender_real`, `detect_country`, `homophones`,
+`available_countries`, `locales`, `locale_formatters`. Class: `Faker`.
+
+## Rust API
+
+```rust
+use faker2::Faker;
+
+let f = Faker::seeded(42);
+f.gen("ja_JP", "name");                          // -> Option<String>, 151 locales
+f.first_name_like_real("Jacques", Some("FR"));   // needs the `real-names` feature
+Faker::homophones("Dominique", "FR", "balanced", 5, true, None);
+//   -> Vec<(String /*name*/, f64 /*prob*/, f64 /*similarity*/)>
+Faker::detect_country("Yuki", 3);
+```
+
+Features: `real-names` (parquet name dataset + homophones), `locales`
+(151-locale `gen`). See [`rust/README.md`](rust/README.md).
+
 ## Repository layout
 
 ```
