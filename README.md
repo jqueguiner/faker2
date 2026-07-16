@@ -149,13 +149,14 @@ independently verified in `rust/tests/algo.rs`.
 | | Python (original) | Rust (this port) |
 |---|---:|---:|
 | Locales | 151 | **151** |
-| Formatters | ~230 | **203 (88%)** |
+| Formatters | ~230 | **213 (93%)** |
 
-Every locale is covered, and **~98% of the single-string formatters** are ported
+Every locale is covered, and **100% of the single-string formatters** are ported
 (name, address, credit cards, IBAN, barcodes, colors, dates, network, python
-scalars, geo, doi, passport, user-agent, lorem, gendered names, …). The ~27
-remaining return **non-string data** (JSON / bytes / CSV / lists / dicts) or take
-range arguments (`date_between_dates`) — not applicable to a single-string
+scalars, geo, doi, passport, user-agent, lorem, gendered names, json/csv/xml, …).
+The ~17 remaining return **non-string data** — raw bytes (`binary`, `image`,
+`json_bytes`, `tar`, `zip`), Python collections (`pylist`, `pydict`, `pyset`,
+`profile`, …) or need an argument (`enum`) — not applicable to a single-string
 generator.
 
 ### Improvements over the original Faker

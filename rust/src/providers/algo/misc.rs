@@ -140,6 +140,141 @@ fn password(f: &Faker, _locale: &str) -> String {
     String::from_utf8(chars).unwrap_or_else(|_| "Password1!".to_string())
 }
 
+// ---- structured-data formatters ---------------------------------------------
+
+/// Fetch a fake value for `formatter`, falling back to a literal when absent.
+fn field(f: &Faker, locale: &str, formatter: &str) -> String {
+    f.gen(locale, formatter)
+        .unwrap_or_else(|| "value".to_string())
+}
+
+/// Escape a string for inclusion inside a JSON double-quoted value.
+fn json_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out
+}
+
+/// Escape a string for inclusion in XML text/element content.
+fn xml_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            c => out.push(c),
+        }
+    }
+    out
+}
+
+/// Quote a field for a delimited (CSV-family) file, doubling embedded quotes.
+fn dsv_quote(s: &str) -> String {
+    format!("\"{}\"", s.replace('"', "\"\""))
+}
+
+/// json — a JSON object string of four fake fields.
+fn json(f: &Faker, locale: &str) -> String {
+    format!(
+        "{{\"name\": \"{}\", \"email\": \"{}\", \"city\": \"{}\", \"job\": \"{}\"}}",
+        json_escape(&field(f, locale, "name")),
+        json_escape(&field(f, locale, "email")),
+        json_escape(&field(f, locale, "city")),
+        json_escape(&field(f, locale, "job")),
+    )
+}
+
+/// Build a delimited document: quoted header + N quoted data rows (CRLF joined).
+fn delimited(f: &Faker, locale: &str, delimiter: char) -> String {
+    let cols = ["name", "email", "job"];
+    let d = delimiter.to_string();
+    let mut lines: Vec<String> = Vec::new();
+    lines.push(
+        cols.iter()
+            .map(|c| dsv_quote(c))
+            .collect::<Vec<_>>()
+            .join(&d),
+    );
+    let num_rows = f.rng.random_int(3, 5, 1) as usize;
+    for _ in 0..num_rows {
+        let row = cols
+            .iter()
+            .map(|c| dsv_quote(&field(f, locale, c)))
+            .collect::<Vec<_>>()
+            .join(&d);
+        lines.push(row);
+    }
+    let mut out = lines.join("\r\n");
+    out.push_str("\r\n");
+    out
+}
+
+/// csv — comma-delimited quoted rows.
+fn csv(f: &Faker, locale: &str) -> String {
+    delimited(f, locale, ',')
+}
+
+/// tsv — tab-delimited quoted rows.
+fn tsv(f: &Faker, locale: &str) -> String {
+    delimited(f, locale, '\t')
+}
+
+/// psv — pipe-delimited quoted rows.
+fn psv(f: &Faker, locale: &str) -> String {
+    delimited(f, locale, '|')
+}
+
+/// dsv — semicolon-delimited quoted rows.
+fn dsv(f: &Faker, locale: &str) -> String {
+    delimited(f, locale, ';')
+}
+
+/// fixed_width — each field left-justified to a fixed column width.
+fn fixed_width(f: &Faker, locale: &str) -> String {
+    let cols = ["name", "email", "job"];
+    let width = 20usize;
+    let num_rows = f.rng.random_int(3, 5, 1) as usize;
+    let mut lines: Vec<String> = Vec::new();
+    for _ in 0..num_rows {
+        let row: String = cols
+            .iter()
+            .map(|c| {
+                let mut v = field(f, locale, c);
+                v.truncate(width);
+                format!("{:<width$}", v, width = width)
+            })
+            .collect();
+        lines.push(row);
+    }
+    lines.join("\n")
+}
+
+/// xml — a small XML document with two `<record>` elements.
+fn xml(f: &Faker, locale: &str) -> String {
+    let mut out = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root>");
+    for _ in 0..2 {
+        out.push_str(&format!(
+            "<record><name>{}</name><email>{}</email><job>{}</job></record>",
+            xml_escape(&field(f, locale, "name")),
+            xml_escape(&field(f, locale, "email")),
+            xml_escape(&field(f, locale, "job")),
+        ));
+    }
+    out.push_str("</root>");
+    out
+}
+
 // ---- dispatch ---------------------------------------------------------------
 
 /// Return `Some(value)` for a formatter this module implements, else `None`.
@@ -154,6 +289,13 @@ pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
         "uuid1" => uuid1(f, locale),
         "uuid7" => uuid7(f, locale),
         "password" => password(f, locale),
+        "json" => json(f, locale),
+        "csv" => csv(f, locale),
+        "tsv" => tsv(f, locale),
+        "psv" => psv(f, locale),
+        "dsv" => dsv(f, locale),
+        "fixed_width" => fixed_width(f, locale),
+        "xml" => xml(f, locale),
         _ => return None,
     })
 }

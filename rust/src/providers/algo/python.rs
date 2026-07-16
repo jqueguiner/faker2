@@ -87,6 +87,20 @@ pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
         "pyint" => pyint(f, locale),
         "pyfloat" => pyfloat(f, locale),
         "pydecimal" => pydecimal(f, locale),
+        "pytimezone" => pytimezone(f, locale),
         _ => return None,
     })
+}
+
+#[rustfmt::skip]
+const TZ: &[&str] = &[
+    "UTC","America/New_York","America/Chicago","America/Los_Angeles","America/Sao_Paulo",
+    "Europe/London","Europe/Paris","Europe/Berlin","Europe/Madrid","Europe/Moscow",
+    "Africa/Cairo","Africa/Lagos","Asia/Tokyo","Asia/Shanghai","Asia/Kolkata",
+    "Asia/Dubai","Asia/Singapore","Australia/Sydney","Pacific/Auckland","America/Mexico_City",
+];
+
+/// A random IANA timezone name (Python returns a ZoneInfo; we return its key).
+fn pytimezone(f: &Faker, _locale: &str) -> String {
+    TZ[f.rng.below(TZ.len())].to_string()
 }
