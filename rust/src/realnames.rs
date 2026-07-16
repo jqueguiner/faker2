@@ -91,13 +91,6 @@ fn default_dist(method: &str) -> usize {
     }
 }
 
-/// Strip IPA stress/length marks and separators before comparing phonemes.
-fn norm_ipa(s: &str) -> String {
-    s.chars()
-        .filter(|c| !matches!(c, 'ˈ' | 'ˌ' | 'ː' | 'ˑ' | ' ' | '.' | '/'))
-        .collect()
-}
-
 /// Edit distance over chars, short-circuiting once it provably exceeds `cap`.
 fn levenshtein(a: &[char], b: &[char], cap: usize) -> usize {
     if a.len().abs_diff(b.len()) > cap {
@@ -234,7 +227,7 @@ impl NameBank {
             let freqs = col_f32(batch.column(idx("frequency")).as_ref());
             let shares = col_f32(batch.column(idx("country_share")).as_ref());
             let phonetics = col_strings(batch.column(idx("phonetic")).as_ref());
-            let ipas = col_strings(batch.column(idx("ipa")).as_ref());
+            let ipas = col_strings(batch.column(idx("g2p_ipa")).as_ref());
 
             for i in 0..names.len() {
                 let g = match &genders[i] {
@@ -255,7 +248,7 @@ impl NameBank {
                     .unwrap_or(1e-9);
                 let cc = ccs[i].clone();
                 let phon = phonetics[i].clone().unwrap_or_default();
-                let ipa_n = ipas[i].as_deref().map(norm_ipa).unwrap_or_default();
+                let ipa_n = ipas[i].clone().unwrap_or_default(); // raw g2p per-language IPA
 
                 // weighted-draw pools (per-country + global)
                 for scope in [cc.clone(), None] {
