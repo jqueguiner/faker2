@@ -67,31 +67,33 @@ variant `faker2.naming.gender` has no extra dependency.
 frequency share), not where the most *people* with that name live — raw
 population counts are intentionally not in the dataset.
 
-`homophones` returns same-sounding names in a country with probabilities
-(weighted by frequency share, summing to 1). Pick the matching `method`:
+`homophones` returns same-sounding names in a country as
+**`(name, probability, similarity)`** triples — `probability` = frequency share
+within the group (sums to 1); `similarity` = g2p2 per-language phonetic
+similarity (0..1) of that name to the query. Pick the matching `method`:
 
 - `"metaphone"` (default) — double-metaphone group; fast but coarse (may pull in
   near-homophones, e.g. Sophie↔Xavier).
-- `"ipa"` — **per-language** phonetic similarity: every name is phonemized in
-  its own language with [g2p2](https://github.com/jqueguiner/g2p2) (`g2p_ipa`
-  column) and compared with g2p2's articulatory feature-weighted alignment — so
-  Mohammed→Mohammad, Giovanni→Gianni use real Arabic/Italian phonetics, not an
-  anglocentric transcription.
+- `"ipa"` — **per-language** phonetics: every name in the dataset is phonemized
+  in its own language with [g2p2](https://github.com/jqueguiner/g2p2)
+  (the `g2p_ipa` column) and scored with g2p2's articulatory feature-weighted
+  alignment — so Mohammed→Mohammad, Giovanni→Gianni use real Arabic/Italian
+  phonetics, not an anglocentric transcription.
 - `"levenshtein"` — spelling within `max_distance` edits; orthographic variants.
-- `"balanced"` — IPA + spelling consensus with **per-country weights** swept
-  offline (`scripts/sweep_balanced.py` → `data/balanced_params.json`, 119
-  countries). Drops metaphone-only collisions (Sophie↛Xavier).
+- `"balanced"` — g2p2 phonetics + spelling consensus with **per-country weights**
+  swept offline (`data/balanced_params.json`, 119 countries). Drops
+  metaphone-only collisions (Sophie↛Xavier).
 
 ```python
-realnames.homophones("Dominique", "FR", method="ipa")          # Dominique .97, Dominik .02 …
+realnames.homophones("Dominique", "FR", method="ipa")          # (name, prob, similarity)
 realnames.homophones("Marc", "FR", method="levenshtein", max_distance=1)
 realnames.homophones("Sophie", "FR", method="balanced")        # per-country tuned; no Xavier
 ```
 
-The balanced weights were tuned by sweeping thousands of names per country
-against a spelling+metaphone consensus objective (IPA kept independent, since
-the dataset's IPA is a single English G2P). Regenerate with
-`PYTHONPATH=. python3 scripts/sweep_balanced.py`.
+The balanced weights are tuned by `scripts/sweep_balanced.py`, which grid-searches
+`(w_ipa, min, cap)` per country against a spelling+metaphone consensus objective,
+using g2p2 similarity on the per-language `g2p_ipa`. Regenerate with
+`PYTHONPATH=. python3 scripts/sweep_balanced.py` (needs `g2p2`, `pyarrow`).
 
 ## Rust port
 
