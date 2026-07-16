@@ -634,6 +634,186 @@ fn date_between(f: &Faker, _locale: &str) -> String {
     format!("{:04}-{}-{}", y, z2(mo), z2(d))
 }
 
+// ---------------------------------------------------------------------------
+// NOW_TS breakdown helpers (used for "this_century / this_decade / this_year /
+// this_month" variants).  We fix "today" as 2024-01-01.
+// ---------------------------------------------------------------------------
+
+/// Returns the Unix timestamp for YYYY-01-01 00:00:00 UTC.
+fn ts_year_start(year: i32) -> i64 {
+    // Days from 1970-01-01 to `year`-01-01 via the inverse of civil_from_days.
+    // We use the same Hinnant epoch-shift trick in reverse.
+    let y = year as i64 - if 1 <= 1 { 0 } else { 1 }; // month 1 >= 3, so no shift
+                                                      // Simpler: iterate from the known anchor 2024-01-01 = 1704067200.
+                                                      // But better: compute directly.
+                                                      // Days since 1970-01-01 to the start of `year`:
+                                                      //   = 365*(year-1970) + leap_count
+    let y0 = year as i64;
+    let leap_count =
+        (y0 - 1) / 4 - (y0 - 1) / 100 + (y0 - 1) / 400 - (1969 / 4 - 1969 / 100 + 1969 / 400);
+    let days = 365 * (y0 - 1970) + leap_count;
+    days * 86_400
+}
+
+/// Returns the Unix timestamp for YYYY-MM-01 00:00:00 UTC.
+fn ts_month_start(year: i32, month: u32) -> i64 {
+    // Days in each month (non-leap).
+    const DAYS_IN_MONTH: [i64; 13] = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let mut ts = ts_year_start(year);
+    let is_leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+    for m in 1..month {
+        let mut days = DAYS_IN_MONTH[m as usize];
+        if m == 2 && is_leap {
+            days += 1;
+        }
+        ts += days * 86_400;
+    }
+    ts
+}
+
+/// date_object: same as `date` — a YYYY-MM-DD between 1970 and NOW_TS.
+fn date_object(f: &Faker, _locale: &str) -> String {
+    let ts = rand_ts_impl(f, 0, NOW_TS);
+    let (y, mo, d, _, _, _) = civil_from_unix(ts);
+    format!("{:04}-{}-{}", y, z2(mo), z2(d))
+}
+
+/// time_object: same as `time` — a HH:MM:SS.
+fn time_object(f: &Faker, _locale: &str) -> String {
+    let ts = rand_ts_impl(f, 0, NOW_TS);
+    let (_, _, _, h, mi, s) = civil_from_unix(ts);
+    format!("{}:{}:{}", z2(h), z2(mi), z2(s))
+}
+
+/// time_delta: a random duration formatted like Python's timedelta str,
+/// e.g. "3 days, 4:05:06" or "0:01:23".
+/// Range: 0 s .. 30 days (matching the default end_datetime=None → now).
+fn time_delta(f: &Faker, _locale: &str) -> String {
+    let max_secs = 30 * 86_400_i64;
+    let total = rand_ts_impl(f, 0, max_secs);
+    let days = total / 86_400;
+    let rem = total % 86_400;
+    let h = rem / 3600;
+    let mi = (rem % 3600) / 60;
+    let s = rem % 60;
+    if days > 0 {
+        format!(
+            "{} day{}, {}:{}:{}",
+            days,
+            if days == 1 { "" } else { "s" },
+            h,
+            z2(mi as u32),
+            z2(s as u32)
+        )
+    } else {
+        format!("{}:{}:{}", h, z2(mi as u32), z2(s as u32))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// date_this_* / date_time_this_* helpers.
+// NOW_TS = 2024-01-01 00:00:00 UTC  →  year=2024, month=1, day=1.
+// ---------------------------------------------------------------------------
+
+const NOW_YEAR: i32 = 2024;
+const NOW_MONTH: u32 = 1;
+
+/// date_this_century: 2000-01-01 .. NOW_TS (before_today=true, after_today=false default).
+fn date_this_century(f: &Faker, _locale: &str) -> String {
+    let century_start = ts_year_start(NOW_YEAR - (NOW_YEAR % 100));
+    let ts = rand_ts_impl(f, century_start, NOW_TS);
+    let (y, mo, d, _, _, _) = civil_from_unix(ts);
+    format!("{:04}-{}-{}", y, z2(mo), z2(d))
+}
+
+/// date_this_decade: 2020-01-01 .. NOW_TS.
+fn date_this_decade(f: &Faker, _locale: &str) -> String {
+    let decade_start = ts_year_start(NOW_YEAR - (NOW_YEAR % 10));
+    let ts = rand_ts_impl(f, decade_start, NOW_TS);
+    let (y, mo, d, _, _, _) = civil_from_unix(ts);
+    format!("{:04}-{}-{}", y, z2(mo), z2(d))
+}
+
+/// date_this_year: 2024-01-01 .. NOW_TS.
+fn date_this_year(f: &Faker, _locale: &str) -> String {
+    let year_start = ts_year_start(NOW_YEAR);
+    let ts = rand_ts_impl(f, year_start, NOW_TS);
+    let (y, mo, d, _, _, _) = civil_from_unix(ts);
+    format!("{:04}-{}-{}", y, z2(mo), z2(d))
+}
+
+/// date_this_month: 2024-01-01 .. NOW_TS.
+fn date_this_month(f: &Faker, _locale: &str) -> String {
+    let month_start = ts_month_start(NOW_YEAR, NOW_MONTH);
+    let ts = rand_ts_impl(f, month_start, NOW_TS);
+    let (y, mo, d, _, _, _) = civil_from_unix(ts);
+    format!("{:04}-{}-{}", y, z2(mo), z2(d))
+}
+
+/// date_time_this_century: datetime in current century up to NOW_TS.
+fn date_time_this_century(f: &Faker, _locale: &str) -> String {
+    let century_start = ts_year_start(NOW_YEAR - (NOW_YEAR % 100));
+    let ts = rand_ts_impl(f, century_start, NOW_TS);
+    let (y, mo, d, h, mi, s) = civil_from_unix(ts);
+    format!(
+        "{:04}-{}-{}T{}:{}:{}",
+        y,
+        z2(mo),
+        z2(d),
+        z2(h),
+        z2(mi),
+        z2(s)
+    )
+}
+
+/// date_time_this_decade: datetime in current decade up to NOW_TS.
+fn date_time_this_decade(f: &Faker, _locale: &str) -> String {
+    let decade_start = ts_year_start(NOW_YEAR - (NOW_YEAR % 10));
+    let ts = rand_ts_impl(f, decade_start, NOW_TS);
+    let (y, mo, d, h, mi, s) = civil_from_unix(ts);
+    format!(
+        "{:04}-{}-{}T{}:{}:{}",
+        y,
+        z2(mo),
+        z2(d),
+        z2(h),
+        z2(mi),
+        z2(s)
+    )
+}
+
+/// date_time_this_year: datetime in current year up to NOW_TS.
+fn date_time_this_year(f: &Faker, _locale: &str) -> String {
+    let year_start = ts_year_start(NOW_YEAR);
+    let ts = rand_ts_impl(f, year_start, NOW_TS);
+    let (y, mo, d, h, mi, s) = civil_from_unix(ts);
+    format!(
+        "{:04}-{}-{}T{}:{}:{}",
+        y,
+        z2(mo),
+        z2(d),
+        z2(h),
+        z2(mi),
+        z2(s)
+    )
+}
+
+/// date_time_this_month: datetime in current month up to NOW_TS.
+fn date_time_this_month(f: &Faker, _locale: &str) -> String {
+    let month_start = ts_month_start(NOW_YEAR, NOW_MONTH);
+    let ts = rand_ts_impl(f, month_start, NOW_TS);
+    let (y, mo, d, h, mi, s) = civil_from_unix(ts);
+    format!(
+        "{:04}-{}-{}T{}:{}:{}",
+        y,
+        z2(mo),
+        z2(d),
+        z2(h),
+        z2(mi),
+        z2(s)
+    )
+}
+
 /// Return `Some(value)` for a formatter this module implements, else `None`.
 pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
     Some(match name {
@@ -658,6 +838,17 @@ pub fn dispatch(f: &Faker, locale: &str, name: &str) -> Option<String> {
         "future_datetime" => future_datetime(f, locale),
         "date_time_between" => date_time_between(f, locale),
         "date_between" => date_between(f, locale),
+        "date_object" => date_object(f, locale),
+        "time_object" => time_object(f, locale),
+        "time_delta" => time_delta(f, locale),
+        "date_this_century" => date_this_century(f, locale),
+        "date_this_decade" => date_this_decade(f, locale),
+        "date_this_year" => date_this_year(f, locale),
+        "date_this_month" => date_this_month(f, locale),
+        "date_time_this_century" => date_time_this_century(f, locale),
+        "date_time_this_decade" => date_time_this_decade(f, locale),
+        "date_time_this_year" => date_time_this_year(f, locale),
+        "date_time_this_month" => date_time_this_month(f, locale),
         _ => return None,
     })
 }

@@ -74,8 +74,9 @@ impl Rng {
         if step <= 0 || max < min {
             return min;
         }
-        let n = ((max - min) / step) + 1;
-        min + self.below(n as usize) as i64 * step
+        // i128 math avoids overflow on wide ranges (e.g. 0..=i64::MAX).
+        let n = ((max as i128 - min as i128) / step as i128 + 1).min(usize::MAX as i128) as usize;
+        (min as i128 + self.below(n) as i128 * step as i128) as i64
     }
 
     pub fn random_digit(&self) -> u32 {
