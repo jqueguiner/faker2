@@ -79,6 +79,19 @@ def _sim(a: str, b: str) -> float:
     return 1.0 - _levenshtein(a, b, m) / m
 
 
+def _g2p_sim(a: str, b: str) -> float:
+    """Per-language phonetic similarity of two g2p IPA strings (g2p2, weighted).
+    Falls back to edit-distance similarity if g2p2 is unavailable."""
+    if not a or not b:
+        return 0.0
+    try:
+        import g2p2
+
+        return float(g2p2.similarity(a, b, "weighted"))
+    except Exception:
+        return _sim(a, b)
+
+
 def _levenshtein(a: str, b: str, cap: int) -> int:
     """Edit distance, short-circuiting once it provably exceeds ``cap``."""
     if abs(len(a) - len(b)) > cap:
@@ -237,7 +250,7 @@ class _NameBank:
         top: int = 10,
         include_self: bool = True,
         max_distance: Optional[int] = None,
-    ) -> List[Tuple[str, float]]:
+    ) -> List[Tuple[str, float, float]]:
         """Names that sound like ``name`` in ``country``, with probabilities.
 
         ``method`` selects how candidates are matched:
@@ -263,8 +276,16 @@ class _NameBank:
         if not include_self:
             items = [(n, w) for n, w in items if n.lower() != key]
         total = sum(w for _n, w in items) or 1.0
-        ranked = sorted(items, key=lambda kv: kv[1], reverse=True)
-        return [(n, w / total) for n, w in ranked[:top]]
+        ranked = sorted(items, key=lambda kv: kv[1], reverse=True)[:top]
+        # attach g2p per-language phonetic similarity of each result to the query
+        q_ipa = self._ipa_key.get((key, country), "")
+        table = self._by_country.get(country, {})
+
+        def _psim(nm: str) -> float:
+            row = table.get(nm)
+            return _g2p_sim(q_ipa, row[1]) if row else 0.0
+
+        return [(n, w / total, _psim(n)) for n, w in ranked]
 
     def _balanced(self, key: str, country: str, max_distance: Optional[int]) -> List[Tuple[str, float]]:
         """Consensus of IPA + metaphone + spelling, weighted by frequency.
@@ -299,7 +320,7 @@ class _NameBank:
             if not r:
                 continue
             ascii_n, ipa_n, share, phon = r
-            ipa_sim = _sim(q_ipa, ipa_n)
+            ipa_sim = _g2p_sim(q_ipa, ipa_n)
             spell_sim = _sim(key, ascii_n)
             meta = 1.0 if q_phon and phon == q_phon else 0.0
             if q_ipa and ipa_n:
@@ -381,7 +402,7 @@ def homophones(
     top: int = 10,
     include_self: bool = True,
     max_distance: Optional[int] = None,
-) -> List[Tuple[str, float]]:
+) -> List[Tuple[str, float, float]]:
     """Same-sounding names in a country, with probabilities.
 
         homophones("Dominique", "FR")                    # metaphone (default)

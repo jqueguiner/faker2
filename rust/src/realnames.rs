@@ -398,7 +398,7 @@ impl NameBank {
         top: usize,
         include_self: bool,
         max_distance: Option<usize>,
-    ) -> Vec<(String, f64)> {
+    ) -> Vec<(String, f64, f64)> {
         let key = name.trim().to_lowercase();
         let mut items: Vec<(String, f64)> = match method {
             METAPHONE => self
@@ -421,7 +421,23 @@ impl NameBank {
         items.iter_mut().for_each(|(_, w)| *w /= total);
         items.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
         items.truncate(top);
+        // attach the g2p phonetic similarity of each result to the query name
+        let q_ipa: Vec<char> = self
+            .ipa_key
+            .get(&(key.clone(), country.to_string()))
+            .map(|s| s.chars().collect())
+            .unwrap_or_default();
+        let table = self.by_country.get(country);
         items
+            .into_iter()
+            .map(|(n, p)| {
+                let sim = table
+                    .and_then(|t| t.get(&n))
+                    .map(|row| g2p_ipa_sim(&q_ipa, &row.ipa))
+                    .unwrap_or(0.0);
+                (n, p, sim)
+            })
+            .collect()
     }
 
     fn fuzzy(
@@ -597,7 +613,9 @@ impl Faker {
         bank().countries()
     }
 
-    /// Same-sounding names in a country with probabilities.
+    /// Same-sounding names in a country: `(name, probability, similarity)`.
+    /// `probability` = frequency share within the group; `similarity` = g2p
+    /// per-language phonetic similarity (0..1) of that name to the query.
     ///
     /// `method`: `"metaphone"` | `"ipa"` | `"levenshtein"` | `"balanced"`.
     pub fn homophones(
@@ -607,7 +625,7 @@ impl Faker {
         top: usize,
         include_self: bool,
         max_distance: Option<usize>,
-    ) -> Vec<(String, f64)> {
+    ) -> Vec<(String, f64, f64)> {
         bank().homophones(name, country, method, top, include_self, max_distance)
     }
 }
