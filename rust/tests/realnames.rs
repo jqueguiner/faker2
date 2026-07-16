@@ -74,8 +74,8 @@ fn available_countries() {
     assert_eq!(ccs, sorted);
 }
 
-fn names(v: Vec<(String, f64)>) -> Vec<String> {
-    v.into_iter().map(|(n, _)| n).collect()
+fn names(v: Vec<(String, f64, f64)>) -> Vec<String> {
+    v.into_iter().map(|(n, _, _)| n).collect()
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn homophones_methods() {
     for m in ["metaphone", "ipa", "levenshtein", "balanced"] {
         let h = Faker::homophones("Dominique", "FR", m, 999, true, None);
         assert_eq!(h[0].0, "Dominique", "method {m}");
-        let total: f64 = h.iter().map(|(_, p)| p).sum();
+        let total: f64 = h.iter().map(|(_, p, _)| p).sum();
         assert!((total - 1.0).abs() < 1e-6, "method {m} sums to {total}");
     }
     // metaphone is coarse (Xavier collides); ipa + balanced drop it

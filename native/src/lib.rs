@@ -50,7 +50,7 @@ fn homophones(
     top: usize,
     include_self: bool,
     max_distance: Option<usize>,
-) -> Vec<(String, f64)> {
+) -> Vec<(String, f64, f64)> {
     RsFaker::homophones(name, country, method, top, include_self, max_distance)
 }
 

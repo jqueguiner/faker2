@@ -20,7 +20,7 @@ f = faker2.Faker(42)                  # seedable, deterministic
 f.gen("fr_FR", "name")                # 'Édouard Guichard'
 f.gen("ja_JP", "address")             # Japanese address
 f.gen("en_US", "credit_card_number")  # Luhn-valid
-f.homophones("Dominique", "FR")       # improvement: same-sounding names + probabilities
+f.homophones("Dominique", "FR")       # (name, probability, phonetic_similarity)
 ```
 
 Upstream Faker docs: [`README.upstream.rst`](README.upstream.rst).
@@ -54,7 +54,7 @@ realnames.first_name_like("Jacques", "FR")    # frequency-weighted male FR name
 realnames.first_name("JP", "f")               # weighted female Japanese name
 realnames.detect_country("Yuki")              # [("JP", 0.58), ("CN", 0.05), ...]
 realnames.detect_country("Bjorn")             # [("SE", 0.29), ("NO", 0.22), ...]
-realnames.homophones("Dominique", "FR")       # [("Dominique", 0.91), ("Dominic", 0.03), ...]
+realnames.homophones("Dominique", "FR")       # [("Dominique", 0.94, 1.0), ("Dominic", 0.02, 0.80), ...]  (name, prob, g2p similarity)
 
 grammar.pluralize("baby")                     # "babies"
 grammar.agree(3, "dog")                       # "3 dogs"

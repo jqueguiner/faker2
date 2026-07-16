@@ -75,14 +75,14 @@ def test_detect_country():
 
 def test_homophones():
     h = rn.homophones("Dominique", "FR", top=6)
-    names = [n for n, _p in h]
+    names = [n for n, _p, _s in h]
     assert h[0][0] == "Dominique"  # most frequent variant first
     assert "Dominic" in names and "Dominik" in names  # same-sounding variants
-    assert abs(sum(p for _n, p in rn.homophones("Dominique", "FR", top=999)) - 1.0) < 1e-6
+    assert abs(sum(p for _n, p, _s in rn.homophones("Dominique", "FR", top=999)) - 1.0) < 1e-6
     # symmetric: Dominic sees the same group
-    assert "Dominique" in [n for n, _ in rn.homophones("Dominic", "FR")]
+    assert "Dominique" in [n for n, _, _ in rn.homophones("Dominic", "FR")]
     # exclude_self drops the query name
-    assert "Dominique" not in [n for n, _ in rn.homophones("Dominique", "FR", include_self=False)]
+    assert "Dominique" not in [n for n, _, _ in rn.homophones("Dominique", "FR", include_self=False)]
     assert rn.homophones("Zzxqwv", "FR") == []  # unknown -> empty
     assert len(rn.homophones("Marc", "FR", top=3)) <= 3  # top-N respected
 
@@ -94,20 +94,20 @@ def test_homophones_methods():
     for method in ("metaphone", "ipa", "levenshtein", "balanced"):
         h = rn.homophones("Dominique", "FR", method=method, top=999)
         assert h and h[0][0] == "Dominique"
-        assert abs(sum(p for _n, p in h) - 1.0) < 1e-6
+        assert abs(sum(p for _n, p, _s in h) - 1.0) < 1e-6
 
     # IPA and balanced are more precise than metaphone: Xavier collides in
     # metaphone (coarse) but not in IPA or balanced.
-    meta = [n for n, _ in rn.homophones("Sophie", "FR", method="metaphone", top=20)]
-    ipa = [n for n, _ in rn.homophones("Sophie", "FR", method="ipa", top=20)]
-    bal = [n for n, _ in rn.homophones("Sophie", "FR", method="balanced", top=20)]
+    meta = [n for n, _, _ in rn.homophones("Sophie", "FR", method="metaphone", top=20)]
+    ipa = [n for n, _, _ in rn.homophones("Sophie", "FR", method="ipa", top=20)]
+    bal = [n for n, _, _ in rn.homophones("Sophie", "FR", method="balanced", top=20)]
     assert "Xavier" in meta and "Xavier" not in ipa and "Xavier" not in bal
 
     # levenshtein respects max_distance (all within edit distance 1 of "marc")
     from faker2.naming.realnames import _levenshtein
 
     lev = rn.homophones("Marc", "FR", method="levenshtein", max_distance=1)
-    assert all(_levenshtein("marc", n.lower(), 1) <= 1 for n, _ in lev)
+    assert all(_levenshtein("marc", n.lower(), 1) <= 1 for n, _, _ in lev)
 
     assert rn.homophones("Zzxqwv", "FR", method="ipa") == []
     with _pytest.raises(ValueError):
