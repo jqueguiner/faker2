@@ -32,7 +32,7 @@ jobs:
           - { platform: macos, runner: macos-latest, target: x86_64, manylinux: "" }
           - { platform: windows, runner: windows-latest, target: x64, manylinux: "" }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Stage dataset
         shell: bash
         run: |
@@ -53,7 +53,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Stage dataset
         run: |
           mkdir -p native/python/faker2/data
