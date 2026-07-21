@@ -137,13 +137,13 @@ jobs:
     environment: pypi
     steps:
       - name: Download wheels + sdist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: "{wheels-*,sdist}"
           merge-multiple: true
           path: pydist
       - name: Download CLI binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: cli-*
           merge-multiple: true
