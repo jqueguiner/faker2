@@ -77,7 +77,7 @@ jobs:
       contents: write
       id-token: write # PyPI trusted publishing (OIDC)
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: "{wheels-*,sdist}"
           merge-multiple: true
