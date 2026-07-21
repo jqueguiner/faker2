@@ -83,7 +83,7 @@ jobs:
           merge-multiple: true
           path: dist
       - name: Attach to the Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/*
       # One-time PyPI setup: project `faker2` -> Publishing -> add a GitHub
